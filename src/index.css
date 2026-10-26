@@ -1,0 +1,137 @@
+:root {
+  --ink-black: #000000;
+  --paper-white: #FFFFFF;
+  --charcoal: #121212;
+  --screentone: #262626;
+  --border-thick: 3px solid #FFFFFF;
+  --border-black: 3px solid #000000;
+  
+  --font-manga: 'Dela Gothic One', cursive, sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--ink-black);
+  color: var(--paper-white);
+  font-family: var(--font-body);
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--ink-black);
+  color: var(--paper-white);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Authentic Halftone Screentone Pattern (Zero smooth gradients, pure discrete dot matrix) */
+.screentone-bg {
+  background-image: radial-gradient(#ffffff 1px, transparent 1px);
+  background-size: 8px 8px;
+  opacity: 0.12;
+}
+
+.screentone-dark {
+  background-image: radial-gradient(#000000 1.5px, transparent 1.5px);
+  background-size: 6px 6px;
+}
+
+/* Manga Speedlines (Radial Shuchusen) */
+.speedlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+  background: repeating-conic-gradient(
+    from 0deg,
+    #ffffff 0deg 0.5deg,
+    transparent 0.5deg 5deg
+  );
+  mask-image: radial-gradient(circle, transparent 35%, black 85%);
+  -webkit-mask-image: radial-gradient(circle, transparent 35%, black 85%);
+}
+
+.speedlines.active {
+  opacity: 0.35;
+}
+
+/* Manga Solid Action Buttons */
+.manga-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--paper-white);
+  color: var(--ink-black);
+  font-family: var(--font-manga);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  padding: 0.6rem 1.4rem;
+  border: 3px solid var(--paper-white);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  box-shadow: 4px 4px 0px #333333;
+}
+
+.manga-btn:hover {
+  background-color: var(--ink-black);
+  color: var(--paper-white);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #FFFFFF;
+}
+
+.manga-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--ink-black);
+  color: var(--paper-white);
+  font-family: var(--font-manga);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 1.1rem;
+  border: 2px solid var(--paper-white);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.manga-btn-outline:hover {
+  background-color: var(--paper-white);
+  color: var(--ink-black);
+}
+
+/* Manga Onomatopoeia Kanji Banner */
+.manga-kanji {
+  font-family: var(--font-manga);
+  color: var(--paper-white);
+  text-shadow: 3px 3px 0px #000000, -1px -1px 0px #FFFFFF;
+  user-select: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #FFFFFF;
+}
