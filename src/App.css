@@ -1,4 +1,4 @@
-/* App.css - Techfest 3D Manga Ultimate Edition */
+/* App.css: Techfest 3D Manga Ultimate Edition */
 
 .app-container {
   position: relative;
@@ -283,7 +283,7 @@
   font-weight: 700;
 }
 
-/* Rover Controller & D-Pad */
+/* Rover Controller & DPad */
 .rover-controller-box {
   background: #111111;
   border: 2px solid var(--paper-white);
