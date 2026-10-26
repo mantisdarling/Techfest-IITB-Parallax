@@ -3,13 +3,11 @@ import * as THREE from 'three';
 
 export default function ThreeScene({ 
   scrollProgress, 
-  activeRealm, 
   cameraMode, // 'scroll' | 'orbit' | 'fpv' | 'cockpit'
   droneFormation, // 'sphere' | 'tf' | 'falcon' | 'helix'
   djBeatTrigger,
   botControl, // { x, z, active }
-  onBotGoal,
-  playSfx 
+  onBotGoal
 }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
@@ -23,6 +21,9 @@ export default function ThreeScene({
   const droneFormationRef = useRef(droneFormation);
   const djBeatRef = useRef(djBeatTrigger);
   const botControlRef = useRef(botControl);
+  // Stable ref for onBotGoal callback — avoids adding it to the big useEffect dep array
+  const onBotGoalRef = useRef(onBotGoal);
+  useEffect(() => { onBotGoalRef.current = onBotGoal; }, [onBotGoal]);
 
   // Keep refs synchronized
   useEffect(() => { scrollRef.current = scrollProgress; }, [scrollProgress]);
@@ -47,9 +48,9 @@ export default function ThreeScene({
     camera.position.set(0, 0, 400);
     cameraRef.current = camera;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.toneMapping = THREE.NoToneMapping;
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
@@ -85,7 +86,7 @@ export default function ThreeScene({
     const realm1Group = new THREE.Group();
     realm1Group.position.set(0, 0, 200);
 
-    const muralTex = textureLoader.load('/manga-mural.png');
+    const muralTex = textureLoader.load('/manga_mural.png');
     const muralMesh = new THREE.Mesh(
       new THREE.PlaneGeometry(160, 160),
       new THREE.MeshBasicMaterial({ map: muralTex, side: THREE.DoubleSide })
@@ -113,7 +114,7 @@ export default function ThreeScene({
     scene.add(realm1Group);
 
     // =========================================================================
-    // 3. REALM 2: MESHME-RIZE / 30nm ROBOWARS ARENA (Z: -500)
+    // 3. REALM 2: MESHME RIZE / 30nm ROBOWARS ARENA (Z: -500)
     // =========================================================================
     const realm2Group = new THREE.Group();
     realm2Group.position.set(0, 0, -500);
@@ -199,7 +200,7 @@ export default function ThreeScene({
     objectsRef.current.radar = radar;
 
     // Bot Billboard
-    const botTex = textureLoader.load('/manga-bot-maze.png');
+    const botTex = textureLoader.load('/manga_bot_maze.png');
     const botBoard = new THREE.Mesh(
       new THREE.PlaneGeometry(130, 130),
       new THREE.MeshBasicMaterial({ map: botTex, side: THREE.DoubleSide })
@@ -278,7 +279,7 @@ export default function ThreeScene({
       }
     }
 
-    // 3) Falcon Formation (V-Wing Swarm)
+    // 3) Falcon Formation (V Wing Swarm)
     for (let i = 0; i < droneCount; i++) {
       const side = i % 2 === 0 ? 1 : -1;
       const progress = (i / droneCount);
@@ -325,7 +326,7 @@ export default function ThreeScene({
     objectsRef.current.sphereWire = sphereWire;
 
     // Drone Board
-    const droneTex = textureLoader.load('/manga-drone-sphere.png');
+    const droneTex = textureLoader.load('/manga_drone_sphere.png');
     const droneBoard = new THREE.Mesh(
       new THREE.PlaneGeometry(160, 70),
       new THREE.MeshBasicMaterial({ map: droneTex, side: THREE.DoubleSide })
@@ -375,7 +376,7 @@ export default function ThreeScene({
     objectsRef.current.eqBars = eqBars;
 
     // Stage Board
-    const stageTex = textureLoader.load('/manga-stage.png');
+    const stageTex = textureLoader.load('/manga_stage.png');
     const stageBoard = new THREE.Mesh(
       new THREE.PlaneGeometry(180, 105),
       new THREE.MeshBasicMaterial({ map: stageTex, side: THREE.DoubleSide })
@@ -463,8 +464,8 @@ export default function ThreeScene({
 
           // Goal collision detection
           const distToGoal = Math.hypot(bot.position.x - 70, bot.position.z - (-70));
-          if (distToGoal < 22 && onBotGoal) {
-            onBotGoal();
+          if (distToGoal < 22 && onBotGoalRef.current) {
+            onBotGoalRef.current();
           }
         } else {
           // Autonomous LiDAR patrol
@@ -541,10 +542,12 @@ export default function ThreeScene({
         const targetX = Math.sin(sp * Math.PI * 3) * 60;
         const targetY = Math.cos(sp * Math.PI * 2) * 30;
 
+        const delta = Math.min(clock.getDelta(), 0.05);
+        const factor = 1.0 - Math.exp(-9.0 * delta);
         const dz = targetZ - camera.position.z;
-        camera.position.z += dz * 0.2;
-        camera.position.x += (targetX - camera.position.x) * 0.2;
-        camera.position.y += (targetY - camera.position.y) * 0.2;
+        camera.position.z += dz * factor;
+        camera.position.x += (targetX - camera.position.x) * factor;
+        camera.position.y += (targetY - camera.position.y) * factor;
         camera.lookAt(0, 0, camera.position.z - 200);
       }
 
