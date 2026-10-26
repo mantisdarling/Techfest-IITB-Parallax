@@ -163,7 +163,7 @@
 
 .realm-content {
   pointer-events: auto;
-  max-width: 520px;
+  max-width: 580px;
 }
 
 .realm-content.right-aligned {
@@ -171,15 +171,12 @@
 }
 
 .manga-panel-card {
-  background-color: rgba(6, 6, 6, 0.9);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: #000000;
   border: 3px solid var(--paper-white);
   padding: 2rem 2.25rem;
   position: relative;
   box-shadow: 8px 8px 0px #333333;
   margin-bottom: 1.5rem;
-  isolation: isolate;
 }
 
 .manga-tag {

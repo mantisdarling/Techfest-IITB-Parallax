@@ -127,22 +127,21 @@ export default function ThreeScene({
     realm2Group.add(gridHelper);
 
     // Maze Barrier Walls (Black solid with white wireframe edges)
-    // Low height prevents blocking camera or billboard while maintaining maze geometry
     const mazeWallsGroup = new THREE.Group();
-    mazeWallsGroup.position.set(0, -56, 0);
+    mazeWallsGroup.position.set(0, -50, 0);
 
     const wallCoords = [
       [-90, 0, 10, 80],
       [90, 0, 10, 80],
       [0, -60, 120, 10],
-      [0, 50, 120, 10],
+      [0, 60, 120, 10],
       [-40, -20, 10, 60],
       [40, 20, 10, 60],
       [0, 0, 50, 10],
     ];
 
     wallCoords.forEach(([wx, wz, ww, wd]) => {
-      const wGeo = new THREE.BoxGeometry(ww, 8, wd);
+      const wGeo = new THREE.BoxGeometry(ww, 20, wd);
       const wMesh = new THREE.Mesh(wGeo, new THREE.MeshBasicMaterial({ color: 0x111111 }));
       const wWire = new THREE.LineSegments(
         new THREE.EdgesGeometry(wGeo),
@@ -218,10 +217,10 @@ export default function ThreeScene({
     objectsRef.current.bot = botGroup;
 
     // =========================================================================
-    // 4. REALM 3: CELESTIAL DRONE SWARM (Z: neg 1280) WITH MORPHING FORMATIONS
+    // 4. REALM 3: CELESTIAL DRONE SWARM (Z: neg 1100) WITH MORPHING FORMATIONS
     // =========================================================================
     const realm3Group = new THREE.Group();
-    realm3Group.position.set(0, 0, -1280);
+    realm3Group.position.set(0, 0, -1100);
 
     // 480 Swarm Drone Points with Morph Targets
     const droneCount = 480;
@@ -342,10 +341,10 @@ export default function ThreeScene({
     objectsRef.current.realm3 = realm3Group;
 
     // =========================================================================
-    // 5. REALM 4: TECHNOHOLIX STAGE & INTERACTIVE MONOLITHS (Z: neg 2020)
+    // 5. REALM 4: TECHNOHOLIX STAGE & INTERACTIVE MONOLITHS (Z: neg 1800)
     // =========================================================================
     const realm4Group = new THREE.Group();
-    realm4Group.position.set(0, 0, -2020);
+    realm4Group.position.set(0, 0, -1800);
 
     // Monolith Columns
     const monoliths = [];
@@ -444,7 +443,7 @@ export default function ThreeScene({
       animationFrameId = requestAnimationFrame(animate);
       const dt = Math.min(clock.getDelta(), 0.05);
       elapsedTime += dt;
-      const factor = 1.0 - Math.exp(-7.0 * dt);
+      const factor = 1.0 - Math.exp(-9.0 * dt);
 
       // Gate ring rotation
       if (objectsRef.current.ring1) {
@@ -529,9 +528,9 @@ export default function ThreeScene({
       // Selective Realm Visibility: eliminates inter chapter visual bleed
       const camZ = camera.position.z;
       if (objectsRef.current.realm1) objectsRef.current.realm1.visible = camZ > 0;
-      if (objectsRef.current.realm2) objectsRef.current.realm2.visible = camZ < 250 && camZ > -850;
-      if (objectsRef.current.realm3) objectsRef.current.realm3.visible = camZ < -650 && camZ > -1650;
-      if (objectsRef.current.realm4) objectsRef.current.realm4.visible = camZ < -1400;
+      if (objectsRef.current.realm2) objectsRef.current.realm2.visible = camZ < 250 && camZ > -750;
+      if (objectsRef.current.realm3) objectsRef.current.realm3.visible = camZ < -450 && camZ > -1450;
+      if (objectsRef.current.realm4) objectsRef.current.realm4.visible = camZ < -1100;
 
       // CAMERA MODES
       const mode = cameraModeRef.current;

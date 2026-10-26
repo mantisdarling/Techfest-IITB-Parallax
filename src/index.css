@@ -22,6 +22,7 @@ html {
   background-color: var(--ink-black);
   color: var(--paper-white);
   font-family: var(--font-body);
+  scroll-behavior: smooth;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
