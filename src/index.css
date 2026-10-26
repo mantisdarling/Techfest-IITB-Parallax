@@ -22,7 +22,6 @@ html {
   background-color: var(--ink-black);
   color: var(--paper-white);
   font-family: var(--font-body);
-  scroll-behavior: smooth;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -134,4 +133,14 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: #FFFFFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .speedlines {
+    display: none !important;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

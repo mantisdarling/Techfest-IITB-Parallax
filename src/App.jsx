@@ -127,6 +127,12 @@ export default function App() {
   const djIntervalRef = useRef(null);
   const audioCtxRef = useRef(null);
 
+  // Lock body scroll when any modal is open
+  useEffect(() => {
+    document.body.style.overflow = (selectedDossier || campusMapOpen || passModalOpen) ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [selectedDossier, campusMapOpen, passModalOpen]);
+
   // Single audio context for buttery smooth sound synthesis
   const getAudioContext = useCallback(() => {
     if (!audioCtxRef.current) {
@@ -468,6 +474,7 @@ export default function App() {
               setCampusMapOpen(true);
             }}
             title="View 3D Campus Venues"
+            aria-label="Open campus venue map"
           >
             <MapPin size={14} />
             <span>MAP</span>
@@ -482,6 +489,7 @@ export default function App() {
               if (next) playSfx('kick');
             }}
             title="Toggle Procedural Cyber Audio"
+            aria-label="Toggle sound effects"
           >
             {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
             <span>SFX</span>
@@ -855,7 +863,9 @@ export default function App() {
                 <img 
                   src={selectedDossier.image} 
                   alt={selectedDossier.title}
-                  className="dossier-img" 
+                  className="dossier-img"
+                  loading="eager"
+                  decoding="async"
                 />
               </div>
 

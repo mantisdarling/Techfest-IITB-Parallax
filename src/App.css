@@ -24,6 +24,7 @@
   background-color: rgba(0, 0, 0, 0.9);
   border-bottom: 2px solid var(--paper-white);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .hud-brand {
@@ -162,7 +163,7 @@
 
 .realm-content {
   pointer-events: auto;
-  max-width: 580px;
+  max-width: 520px;
 }
 
 .realm-content.right-aligned {
@@ -170,12 +171,15 @@
 }
 
 .manga-panel-card {
-  background-color: #000000;
+  background-color: rgba(6, 6, 6, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 3px solid var(--paper-white);
   padding: 2rem 2.25rem;
   position: relative;
   box-shadow: 8px 8px 0px #333333;
   margin-bottom: 1.5rem;
+  isolation: isolate;
 }
 
 .manga-tag {
@@ -210,8 +214,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
-  border-top: 1px dashed #555555;
-  border-bottom: 1px dashed #555555;
+  border-top: 1px dotted #666666;
+  border-bottom: 1px dotted #666666;
   padding: 0.85rem 0;
 }
 
@@ -374,7 +378,7 @@
   transform: translate(-50%, -50%);
   width: 140px;
   height: 140px;
-  border: 1px dashed rgba(255, 255, 255, 0.6);
+  border: 1px dotted rgba(255, 255, 255, 0.7);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -490,12 +494,14 @@
   height: 4px;
   background-color: #222222;
   z-index: 51;
+  pointer-events: none;
 }
 
 .scroll-tracker-fill {
   height: 100%;
   background-color: var(--paper-white);
   transition: width 0.1s ease-out;
+  pointer-events: none;
 }
 
 /* ==========================================================================
