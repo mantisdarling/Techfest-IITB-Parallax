@@ -22,10 +22,6 @@ const REALM_DATA = [
     id: 'gateway',
     num: '01',
     kanji: '飛翔',
-    bgKanji: '零壱',
-    bgStamp: 'SECTOR 01 // LAT 19.0760N 72.8777E // IIT BOMBAY GATEWAY',
-    fgCallout: 'ACT 01 // ORIGIN',
-    depthMeter: 'DEPTH 180M',
     sfx: 'ドォォン!',
     tag: 'ORIGIN PORTAL // IIT BOMBAY',
     title: 'WHERE IDEAS TAKE FLIGHT',
@@ -42,10 +38,6 @@ const REALM_DATA = [
     id: 'robowars',
     num: '02',
     kanji: '闘魂',
-    bgKanji: '零弐',
-    bgStamp: 'SECTOR 02 // 30NM CIRCUIT RESOLUTION // AUTONOMOUS ARENA',
-    fgCallout: 'ACT 02 // CIRCUIT',
-    depthMeter: 'DEPTH 550M',
     sfx: 'ガガガッ!',
     tag: 'ARENA // 30nm CIRCUIT MAZE',
     title: 'MESHME RIZE ROBOWARS',
@@ -62,10 +54,6 @@ const REALM_DATA = [
     id: 'drones',
     num: '03',
     kanji: '群星',
-    bgKanji: '零参',
-    bgStamp: 'SECTOR 03 // 500 AUTONOMOUS DRONES // RTK SATELLITE MATRIX',
-    fgCallout: 'ACT 03 // CONSTELLATION',
-    depthMeter: 'DEPTH 1360M',
     sfx: 'キィィン!',
     tag: 'SKYLINE SWARM // 500+ DRONES',
     title: 'CELESTIAL DRONE MATRIX',
@@ -82,10 +70,6 @@ const REALM_DATA = [
     id: 'stage',
     num: '04',
     kanji: '熱狂',
-    bgKanji: '零四',
-    bgStamp: 'SECTOR 04 // 100KW SENSORY RIG // APEX STAGE AMPHITHEATRE',
-    fgCallout: 'ACT 04 // HARMONIC APEX',
-    depthMeter: 'DEPTH 2020M',
     sfx: 'ズバッ!',
     tag: 'THE APEX // TECHNOHOLIX ARENA',
     title: 'TECHNOHOLIX MEGASTAGE',
@@ -149,18 +133,7 @@ export default function App() {
     return () => { document.body.style.overflow = ''; };
   }, [selectedDossier, campusMapOpen, passModalOpen]);
 
-  // Mouse tracking for subtle tactile 3D card tilt
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const nx = (e.clientX / window.innerWidth - 0.5) * 10;
-      const ny = (e.clientY / window.innerHeight - 0.5) * 10;
-      setMousePos({ x: nx, y: ny });
-    };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   // Single audio context for buttery smooth sound synthesis
   const getAudioContext = useCallback(() => {
@@ -543,51 +516,13 @@ export default function App() {
       <main>
         {REALM_DATA.map((realm, index) => {
           const isRight = index % 2 === 1;
-          const realmOffset = (scrollProgress * 3) - index;
-          const bgParallaxY = realmOffset * 85;
-          const fgParallaxY = realmOffset * -125;
-          const fgParallaxX = (isRight ? -1 : 1) * realmOffset * 35;
-
           return (
             <section 
               key={realm.id} 
               id={realm.id} 
               className="scroll-realm"
             >
-              {/* Parallax Background Layer (moves at slower speed, creating deep background distance) */}
-              <div 
-                className="parallax_bg_layer"
-                style={{
-                  transform: `translate3d(0, ${bgParallaxY}px, 0)`
-                }}
-              >
-                <div className="parallax_bg_kanji">{realm.bgKanji}</div>
-                <div className="parallax_bg_watermark">{realm.kanji}</div>
-                <div className="parallax_bg_stamp">{realm.bgStamp}</div>
-              </div>
-
-              {/* Parallax Foreground Layer (moves at faster speed across foreground plane) */}
-              <div 
-                className={`parallax_fg_layer ${isRight ? 'fg_right' : 'fg_left'}`}
-                style={{
-                  transform: `translate3d(${fgParallaxX}px, ${fgParallaxY}px, 0)`
-                }}
-              >
-                <div className="parallax_fg_badge">
-                  <span className="fg_badge_pulse" />
-                  <span>{realm.fgCallout}</span>
-                </div>
-                <div className="parallax_fg_depth">{realm.depthMeter}</div>
-                <div className="parallax_fg_sfx">{realm.sfx}</div>
-              </div>
-
-              {/* Midground Interactive Manga Card with 3D Parallax Tilt */}
-              <div 
-                className={`realm-content ${isRight ? 'right-aligned' : ''}`}
-                style={{
-                  transform: `perspective(1000px) rotateY(${mousePos.x}deg) rotateX(${-mousePos.y}deg)`
-                }}
-              >
+              <div className={`realm-content ${isRight ? 'right-aligned' : ''}`}>
                 <div className="manga-panel-card">
                   {/* Flingable Manga Sound FX Kanji Badge */}
                   <div 
