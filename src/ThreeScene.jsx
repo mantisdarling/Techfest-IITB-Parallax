@@ -41,8 +41,8 @@ export default function ThreeScene({
     // SCENE & CAMERA
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
-    // Fog starts at 200 units, completely blacks out at 680 units
-    scene.fog = new THREE.Fog(0x000000, 200, 680);
+    // Fog starts at 280 units, completely blacks out at 850 units
+    scene.fog = new THREE.Fog(0x000000, 280, 850);
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(54, width / height, 0.1, 1600);
@@ -80,6 +80,7 @@ export default function ThreeScene({
     });
     const starField = new THREE.Points(particleGeo, particleMat);
     scene.add(starField);
+    objectsRef.current.starField = starField;
 
     // =========================================================================
     // 2. REALM 1: THE GATEWAY & WALL MURAL (Z: 180, Camera views from Z: 400)
@@ -116,12 +117,12 @@ export default function ThreeScene({
     objectsRef.current.realm1 = realm1Group;
 
     // =========================================================================
-    // 3. REALM 2: MESHME RIZE / 30nm ROBOWARS ARENA (Z: -550, Camera views from Z: -330)
+    // 3. REALM 2: MESHME RIZE / 30nm ROBOWARS ARENA (Z: neg 550, Camera views from Z: neg 330)
     // =========================================================================
     const realm2Group = new THREE.Group();
     realm2Group.position.set(0, 0, -550);
 
-    // Arena Base Platform (centered on the left at X = -50, clean view unobstructed by right card)
+    // Arena Base Platform centered on the left at X = neg 50, clean view unobstructed by right card
     const arenaCenterX = -50;
     const arenaCenterZ = 0;
     const arenaY = -48;
@@ -142,7 +143,7 @@ export default function ThreeScene({
     realm2Group.add(circuitGrid);
 
     // Manga Maze Corridors (low perimeter curb + crisp interior partition walls)
-    // Interior wall height: 8 units, perimeter: 4 units - does NOT clip or block camera
+    // Interior wall height: 8 units, perimeter: 4 units, does NOT clip or block camera
     const mazeWallsGroup = new THREE.Group();
 
     const mazeWallData = [
@@ -242,6 +243,14 @@ export default function ThreeScene({
     botGroup.add(lidar);
     objectsRef.current.lidar = lidar;
 
+    // Expanding Pulse Radar Ring
+    const radarGeo = new THREE.RingGeometry(5, 6.5, 24);
+    const radar = new THREE.Mesh(radarGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.6 }));
+    radar.rotation.x = -Math.PI / 2;
+    radar.position.set(0, 5.5, -2);
+    botGroup.add(radar);
+    objectsRef.current.radar = radar;
+
     realm2Group.add(botGroup);
     objectsRef.current.bot = botGroup;
     objectsRef.current.arenaBounds = {
@@ -253,7 +262,7 @@ export default function ThreeScene({
       goalZ
     };
 
-    // Mission Tactical Blueprint Backdrop (Framed upright behind the maze, non-intrusive)
+    // Mission Tactical Blueprint Backdrop (Framed upright behind the maze, unobtrusive)
     const botTex = textureLoader.load('/manga_bot_maze.png');
     const botBoard = new THREE.Mesh(
       new THREE.PlaneGeometry(125, 80),
@@ -271,7 +280,7 @@ export default function ThreeScene({
     objectsRef.current.realm2 = realm2Group;
 
     // =========================================================================
-    // 4. REALM 3: CELESTIAL DRONE SWARM (Z: -1360, Camera views from Z: -1100)
+    // 4. REALM 3: CELESTIAL DRONE SWARM (Z: neg 1360, Camera views from Z: neg 1100)
     // =========================================================================
     const realm3Group = new THREE.Group();
     realm3Group.position.set(38, 0, -1360);
@@ -398,7 +407,7 @@ export default function ThreeScene({
     objectsRef.current.realm3 = realm3Group;
 
     // =========================================================================
-    // 5. REALM 4: TECHNOHOLIX STAGE & INTERACTIVE MONOLITHS (Z: -2020, Camera views from Z: -1800)
+    // 5. REALM 4: TECHNOHOLIX STAGE & INTERACTIVE MONOLITHS (Z: neg 2020, Camera views from Z: neg 1800)
     // =========================================================================
     const realm4Group = new THREE.Group();
     realm4Group.position.set(-35, 0, -2020);
@@ -506,7 +515,7 @@ export default function ThreeScene({
     window.addEventListener('mouseup', handleMouseUp);
 
     // =========================================================================
-    // ANIMATION LOOP (Delta-Timed & Smooth 60/120fps)
+    // ANIMATION LOOP (Delta Timed & Smooth 60/120fps)
     // =========================================================================
     let animationFrameId;
     const clock = new THREE.Clock();
@@ -567,15 +576,33 @@ export default function ThreeScene({
             }
           }
         } else {
-          // Autonomous patrol mode when not actively driven
-          bot.position.x = arenaCenterX + Math.sin(elapsedTime * 1.2) * 28;
-          bot.position.z = arenaCenterZ + Math.cos(elapsedTime * 1.2) * 24;
-          bot.rotation.y = elapsedTime * 1.2 + Math.PI / 2;
+          // Autonomous patrol mode with continuous steering when idle
+          const patrolT = elapsedTime * 0.9;
+          bot.position.x = arenaCenterX + Math.sin(patrolT) * 32;
+          bot.position.z = arenaCenterZ + Math.sin(patrolT * 2) * 18;
+          const forwardX = Math.cos(patrolT) * 32;
+          const forwardZ = 2 * Math.cos(patrolT * 2) * 18;
+          bot.rotation.y = Math.atan2(forwardX, forwardZ);
+          if (objectsRef.current.wheels) {
+            objectsRef.current.wheels.forEach(w => {
+              w.rotation.x += 8 * dt;
+            });
+          }
         }
 
         if (objectsRef.current.lidar) {
           objectsRef.current.lidar.rotation.y += 5.0 * dt;
         }
+
+        if (objectsRef.current.radar) {
+          const s = 1.0 + Math.sin(elapsedTime * 6) * 0.45;
+          objectsRef.current.radar.scale.set(s, s, 1);
+        }
+      }
+
+      // Starfield cosmic drift creates depth parallax
+      if (objectsRef.current.starField) {
+        objectsRef.current.starField.rotation.y += 0.012 * dt;
       }
 
       // Drone Swarm Interpolation towards active formation
@@ -591,6 +618,11 @@ export default function ThreeScene({
 
         if (!isDraggingRef.current) {
           objectsRef.current.droneSwarmMesh.rotation.y += 0.25 * dt;
+        }
+
+        if (objectsRef.current.sphereWire && !isDraggingRef.current) {
+          objectsRef.current.sphereWire.rotation.y += 0.15 * dt;
+          objectsRef.current.sphereWire.rotation.x += 0.08 * dt;
         }
       }
 
@@ -611,13 +643,12 @@ export default function ThreeScene({
         }
       }
 
-      // SELECTIVE REALM VISIBILITY:
-      // Completely shuts down visual bleed / overlap between chapters
+      // SELECTIVE REALM VISIBILITY WITH EXTENDED PARALLAX DEPTH:
       const camZ = camera.position.z;
-      if (objectsRef.current.realm1) objectsRef.current.realm1.visible = camZ > -100;
-      if (objectsRef.current.realm2) objectsRef.current.realm2.visible = camZ < 50 && camZ > -850;
-      if (objectsRef.current.realm3) objectsRef.current.realm3.visible = camZ < -700 && camZ > -1550;
-      if (objectsRef.current.realm4) objectsRef.current.realm4.visible = camZ < -1450;
+      if (objectsRef.current.realm1) objectsRef.current.realm1.visible = camZ > -80;
+      if (objectsRef.current.realm2) objectsRef.current.realm2.visible = camZ < 150 && camZ > -950;
+      if (objectsRef.current.realm3) objectsRef.current.realm3.visible = camZ < -600 && camZ > -1700;
+      if (objectsRef.current.realm4) objectsRef.current.realm4.visible = camZ < -1300;
 
       // CAMERA MODES
       const mode = cameraModeRef.current;
@@ -641,40 +672,22 @@ export default function ThreeScene({
         camera.position.y = 80;
         camera.lookAt(0, -20, -700);
       } else {
-        // Default smooth scroll journey with cinematic framing for each chapter
+        // Default smooth continuous parallax scroll journey throughout the 3D space
         const sp = scrollRef.current || 0;
         const targetZ = 400 - sp * 2200;
 
-        let targetX = 0;
-        let targetY = 12;
-        let lookTargetX = 0;
-        let lookTargetY = 0;
+        // Smooth continuous Gaussian spline across the 4 chapters
+        const s1 = Math.exp(-Math.pow((sp - 0.0) / 0.18, 2));
+        const s2 = Math.exp(-Math.pow((sp - 0.33) / 0.18, 2));
+        const s3 = Math.exp(-Math.pow((sp - 0.66) / 0.18, 2));
+        const s4 = Math.exp(-Math.pow((sp - 1.0) / 0.18, 2));
+        const totalS = s1 + s2 + s3 + s4 || 1;
 
-        if (sp < 0.25) {
-          // Chapter 1: Gateway Mural (Subject right, card left)
-          targetX = -18;
-          targetY = 14;
-          lookTargetX = 45;
-          lookTargetY = 8;
-        } else if (sp < 0.52) {
-          // Chapter 2: Robowars Maze Arena (Elevated 3/4 isometric view on the left, card on right)
-          targetX = 18;
-          targetY = 32;
-          lookTargetX = arenaCenterX;
-          lookTargetY = arenaY + 10;
-        } else if (sp < 0.75) {
-          // Chapter 3: Drone Swarm (Subject right/center, card left)
-          targetX = -25;
-          targetY = 8;
-          lookTargetX = 38;
-          lookTargetY = 0;
-        } else {
-          // Chapter 4: Technoholix Megastage (Subject left/center, card right)
-          targetX = 22;
-          targetY = 16;
-          lookTargetX = -35;
-          lookTargetY = 0;
-        }
+        const targetX = (-20 * s1 + 22 * s2 - 28 * s3 + 24 * s4) / totalS + Math.sin(sp * Math.PI * 4) * 6;
+        const targetY = (14 * s1 + 32 * s2 + 10 * s3 + 18 * s4) / totalS + Math.cos(sp * Math.PI * 3) * 4;
+
+        const lookTargetX = (45 * s1 + arenaCenterX * s2 + 38 * s3 - 35 * s4) / totalS;
+        const lookTargetY = (8 * s1 + (arenaY + 10) * s2 + 2 * s4) / totalS;
 
         camera.position.z += (targetZ - camera.position.z) * lerpFactor;
         camera.position.x += (targetX - camera.position.x) * lerpFactor;
