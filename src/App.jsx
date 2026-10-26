@@ -1,28 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ThreeScene from './ThreeScene';
 import { 
   Volume2, 
   VolumeX, 
-  Compass, 
-  Maximize2, 
   ChevronRight, 
-  Zap, 
   Eye, 
   X, 
   Terminal,
-  Activity,
-  Layers,
-  Sparkles,
   MapPin,
-  Music,
-  Gamepad2,
   Crosshair,
   Download,
   ArrowUp,
   ArrowDown,
   ArrowLeft,
-  ArrowRight,
-  ShieldAlert
+  ArrowRight
 } from 'lucide-react';
 import './App.css';
 
@@ -35,7 +26,7 @@ const REALM_DATA = [
     tag: 'ORIGIN PORTAL // IIT BOMBAY',
     title: 'WHERE IDEAS TAKE FLIGHT',
     desc: 'The sacred grounds of Asia’s largest science and technology festival. Across 550 acres of IIT Bombay, thousands of engineers, inventors, and visionaries gather under the legendary Techfest Wall.',
-    image: '/manga-mural.png',
+    image: '/manga_mural.png',
     specs: [
       { label: 'FOOTFALL', val: '175,000+' },
       { label: 'COLLEGES', val: '2,500+' },
@@ -49,9 +40,9 @@ const REALM_DATA = [
     kanji: '闘魂',
     sfx: 'ガガガッ!',
     tag: 'ARENA // 30nm CIRCUIT MAZE',
-    title: 'MESHME-RIZE ROBOWARS',
-    desc: 'Autonomous micro-rovers navigating hyper-complex 30nm precision mazes with LiDAR sensors, sub-millisecond line-detection algorithms, and high-torque titanium gears.',
-    image: '/manga-bot-maze.png',
+    title: 'MESHME RIZE ROBOWARS',
+    desc: 'Autonomous micro rovers navigating hyper complex 30nm precision mazes with LiDAR sensors, sub millisecond line detection algorithms, and high torque titanium gears.',
+    image: '/manga_bot_maze.png',
     specs: [
       { label: 'MAZE RESOLUTION', val: '30nm PRECISION' },
       { label: 'SPEED TRAVERSAL', val: '3.8 M/S MAX' },
@@ -66,12 +57,12 @@ const REALM_DATA = [
     sfx: 'キィィン!',
     tag: 'SKYLINE SWARM // 500+ DRONES',
     title: 'CELESTIAL DRONE MATRIX',
-    desc: 'Over the nighttime cityscape of Mumbai, 500 autonomous drones orchestrate into a massive 3D glowing celestial sphere. Real-time swarm tele-kinetics and satellite positioning.',
-    image: '/manga-drone-sphere.png',
+    desc: 'Over the nighttime cityscape of Mumbai, 500 autonomous drones orchestrate into a massive 3D glowing celestial sphere. Real time swarm tele kinetics and satellite positioning.',
+    image: '/manga_drone_sphere.png',
     specs: [
       { label: 'DRONE FLEET', val: '500+ QUADCOPTERS' },
       { label: 'FORMATION', val: '3D POKÉBALL ORB' },
-      { label: 'GPS SYNC', val: 'RTK SUB-CENTIMETER' },
+      { label: 'GPS SYNC', val: 'RTK SUB CENTIMETER' },
       { label: 'ALTITUDE', val: '120 METERS' }
     ]
   },
@@ -82,8 +73,8 @@ const REALM_DATA = [
     sfx: 'ズバッ!',
     tag: 'THE APEX // TECHNOHOLIX ARENA',
     title: 'TECHNOHOLIX MEGASTAGE',
-    desc: 'The grand fusion of cutting-edge technology and sensory euphoria. Mammoth LED monolithic pillars, pyrotechnic laser grids, and world-renowned EDM performers under the neon TF emblem.',
-    image: '/manga-stage.png',
+    desc: 'The grand fusion of cutting edge technology and sensory euphoria. Mammoth LED monolithic pillars, pyrotechnic laser grids, and world renowned EDM performers under the neon TF emblem.',
+    image: '/manga_stage.png',
     specs: [
       { label: 'STAGE RIG', val: '360° LED MONOLITHS' },
       { label: 'AUDIO SYSTEM', val: '100,000 WATTS' },
@@ -113,16 +104,20 @@ export default function App() {
   const [botControl, setBotControl] = useState({ x: 0, z: 0, active: false });
   const [botGoalAchieved, setBotGoalAchieved] = useState(false);
 
-  // Modals
-  const [selectedDossier, setSelectedDossier] = useState(null);
+  // Modals with lazy initialization
+  const [selectedDossier, setSelectedDossier] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    const p = new URLSearchParams(window.location.search).get('dossier');
+    return p ? REALM_DATA.find(r => r.id === p) || null : null;
+  });
   const [campusMapOpen, setCampusMapOpen] = useState(false);
   const [passModalOpen, setPassModalOpen] = useState(false);
   
-  // Cyber-pass customization
+  // Cyber pass customization
   const [passData, setPassData] = useState({
     name: 'COMMANDER ARCH',
     college: 'IIT BOMBAY',
-    roll: 'TF-2026-9942',
+    roll: 'TF 2026 9942',
     avatar: 'TITAN MECH'
   });
 
@@ -130,94 +125,26 @@ export default function App() {
   const lastScrollY = useRef(0);
   const speedlineTimeout = useRef(null);
   const djIntervalRef = useRef(null);
+  const audioCtxRef = useRef(null);
 
-  // Check URL params / hash on mount
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const realmParam = params.get('realm');
-    const dossierParam = params.get('dossier');
-
-    if (dossierParam) {
-      const match = REALM_DATA.find(r => r.id === dossierParam);
-      if (match) setSelectedDossier(match);
+  // Single audio context for buttery smooth sound synthesis
+  const getAudioContext = useCallback(() => {
+    if (!audioCtxRef.current) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) audioCtxRef.current = new AudioCtx();
     }
-
-    if (realmParam !== null) {
-      const idx = parseInt(realmParam, 10);
-      if (!isNaN(idx) && idx >= 0 && idx < 4) {
-        setTimeout(() => warpToRealm(idx, true), 50);
-      }
-    } else if (window.location.hash) {
-      const id = window.location.hash.replace('#', '');
-      const idx = REALM_DATA.findIndex(r => r.id === id);
-      if (idx !== -1) {
-        setTimeout(() => warpToRealm(idx, true), 50);
-      }
+    if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+      audioCtxRef.current.resume();
     }
+    return audioCtxRef.current;
   }, []);
-
-  // Scroll listener for 3D camera travel
-  useEffect(() => {
-    const handleScroll = () => {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const current = window.scrollY;
-      const progress = maxScroll > 0 ? Math.min(Math.max(current / maxScroll, 0), 1) : 0;
-      setScrollProgress(progress);
-
-      const realmIdx = Math.min(Math.floor(progress * 4), 3);
-      setActiveRealmIndex(realmIdx);
-
-      const delta = Math.abs(current - lastScrollY.current);
-      if (delta > 35) {
-        setSpeedlinesActive(true);
-        if (speedlineTimeout.current) clearTimeout(speedlineTimeout.current);
-        speedlineTimeout.current = setTimeout(() => {
-          setSpeedlinesActive(false);
-        }, 300);
-      }
-      lastScrollY.current = current;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Keyboard controls for Rover (WASD / Arrows)
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (activeRealmIndex !== 1) return;
-      let dx = 0;
-      let dz = 0;
-      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dz = -1;
-      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dz = 1;
-      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dx = -1;
-      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') dx = 1;
-
-      if (dx !== 0 || dz !== 0) {
-        setBotControl({ x: dx, z: dz, active: true });
-        playSfx('click');
-      }
-    };
-
-    const handleKeyUp = (e) => {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key)) {
-        setBotControl(prev => ({ ...prev, x: 0, z: 0 }));
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [activeRealmIndex]);
 
   // Procedural Web Audio synthesizer
-  const playSfx = (type = 'click') => {
+  const playSfx = useCallback((type = 'click') => {
     if (!soundEnabled) return;
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = getAudioContext();
+      if (!ctx) return;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
@@ -284,17 +211,32 @@ export default function App() {
     } catch {
       // Audio not available
     }
-  };
+  }, [soundEnabled, getAudioContext]);
+
+  // Warp to specific realm
+  const warpToRealm = useCallback((index, immediate = false) => {
+    playSfx('warp');
+    setSpeedlinesActive(true);
+    setTimeout(() => setSpeedlinesActive(false), 500);
+
+    const target = REALM_DATA[index];
+    if (target) {
+      const el = document.getElementById(target.id);
+      if (el) {
+        el.scrollIntoView({ behavior: immediate ? 'auto' : 'smooth' });
+      }
+    }
+  }, [playSfx]);
 
   // DJ Beat Trigger
-  const triggerDjPad = (sfxName) => {
+  const triggerDjPad = useCallback((sfxName) => {
     playSfx(sfxName);
     setDjBeatTrigger(true);
     setTimeout(() => setDjBeatTrigger(false), 140);
-  };
+  }, [playSfx]);
 
   // DJ Loop Sequencer
-  const toggleDjLoop = () => {
+  const toggleDjLoop = useCallback(() => {
     if (isLoopingBeat) {
       clearInterval(djIntervalRef.current);
       setIsLoopingBeat(false);
@@ -307,22 +249,90 @@ export default function App() {
         step++;
       }, 250);
     }
-  };
+  }, [isLoopingBeat, triggerDjPad]);
 
-  // Warp to specific realm
-  const warpToRealm = (index, immediate = false) => {
-    playSfx('warp');
-    setSpeedlinesActive(true);
-    setTimeout(() => setSpeedlinesActive(false), 500);
+  // Check URL params / hash on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const realmParam = params.get('realm');
 
-    const target = REALM_DATA[index];
-    if (target) {
-      const el = document.getElementById(target.id);
-      if (el) {
-        el.scrollIntoView({ behavior: immediate ? 'auto' : 'smooth' });
+    if (realmParam !== null) {
+      const idx = parseInt(realmParam, 10);
+      if (!isNaN(idx) && idx >= 0 && idx < 4) {
+        setTimeout(() => warpToRealm(idx, true), 50);
+      }
+    } else if (window.location.hash) {
+      const id = window.location.hash.replace('#', '');
+      const idx = REALM_DATA.findIndex(r => r.id === id);
+      if (idx !== -1) {
+        setTimeout(() => warpToRealm(idx, true), 50);
       }
     }
-  };
+  }, [warpToRealm]);
+
+  // Smooth scroll listener for 3D camera travel
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+          const current = window.scrollY;
+          const progress = maxScroll > 0 ? Math.min(Math.max(current / maxScroll, 0), 1) : 0;
+          setScrollProgress(progress);
+
+          const realmIdx = Math.min(Math.floor(progress * 4), 3);
+          setActiveRealmIndex(realmIdx);
+
+          const delta = Math.abs(current - lastScrollY.current);
+          if (delta > 35) {
+            setSpeedlinesActive(true);
+            if (speedlineTimeout.current) clearTimeout(speedlineTimeout.current);
+            speedlineTimeout.current = setTimeout(() => {
+              setSpeedlinesActive(false);
+            }, 300);
+          }
+          lastScrollY.current = current;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Keyboard controls for Rover (WASD / Arrows)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (activeRealmIndex !== 1) return;
+      let dx = 0;
+      let dz = 0;
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dz = -1;
+      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dz = 1;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dx = -1;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') dx = 1;
+
+      if (dx !== 0 || dz !== 0) {
+        setBotControl({ x: dx, z: dz, active: true });
+        playSfx('click');
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key)) {
+        setBotControl(prev => ({ ...prev, x: 0, z: 0 }));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [activeRealmIndex, playSfx]);
 
   return (
     <div className="app-container">
@@ -388,9 +398,7 @@ export default function App() {
         />
       </div>
 
-      {/* ====================================================================
-          TOP HUD NAVIGATION
-         ==================================================================== */}
+      {/* Top HUD Navigation */}
       <header className="manga-hud-header">
         <div className="hud-brand">
           <div className="hud-logo-box">TF</div>
@@ -400,7 +408,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* 4 Chapter Quick-Jumps */}
+        {/* 4 Chapter Quick Jumps */}
         <nav className="hud-chapters">
           {REALM_DATA.map((r, i) => (
             <button
@@ -428,7 +436,7 @@ export default function App() {
             type="button"
             className={`cam-btn ${cameraMode === 'cockpit' ? 'active' : ''}`}
             onClick={() => { playSfx('warp'); setCameraMode('cockpit'); warpToRealm(1); }}
-            title="First-Person Mecha Cockpit"
+            title="First Person Mecha Cockpit"
           >
             COCKPIT
           </button>
@@ -494,9 +502,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* ====================================================================
-          4 MANGA SCROLL REALMS WITH INTERACTIVE MINI-GAMES
-         ==================================================================== */}
+      {/* 4 Manga Scroll Realms With Interactive Minigames */}
       <main>
         {REALM_DATA.map((realm, index) => {
           const isRight = index % 2 === 1;
@@ -525,7 +531,7 @@ export default function App() {
                   <h2 className="manga-title">{realm.title}</h2>
                   <p className="manga-desc">{realm.desc}</p>
 
-                  {/* REALM 02 SPECIAL: PLAYABLE 30nm ROVER MINI-GAME */}
+                  {/* Realm 02 Special: Playable 30nm Rover Minigame */}
                   {index === 1 && (
                     <div className="rover-controller-box">
                       <div>
@@ -533,7 +539,7 @@ export default function App() {
                           🎮 PLAYABLE 30nm ROVER
                         </div>
                         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#AAAAAA' }}>
-                          USE WASD / KEYS OR D-PAD TO STEER
+                          USE WASD / KEYS OR DPAD TO STEER
                         </div>
                         {botGoalAchieved && (
                           <div style={{ color: '#FFFFFF', fontFamily: 'var(--font-manga)', marginTop: '0.4rem' }}>
@@ -542,7 +548,7 @@ export default function App() {
                         )}
                       </div>
 
-                      {/* On-Screen Touch D-Pad */}
+                      {/* On Screen Touch DPad */}
                       <div className="dpad-container">
                         <div />
                         <button 
@@ -595,7 +601,7 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* REALM 03 SPECIAL: 500-DRONE SWARM FORMATION SHIFTER */}
+                  {/* Realm 03 Special: 500 Drone Swarm Formation Shifter */}
                   {index === 2 && (
                     <div>
                       <div style={{ fontFamily: 'var(--font-manga)', fontSize: '0.8rem', marginBottom: '0.4rem' }}>
@@ -634,7 +640,7 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* REALM 04 SPECIAL: TECHNOHOLIX DJ SYNTH MATRIX */}
+                  {/* Realm 04 Special: Technoholix DJ Synth Matrix */}
                   {index === 3 && (
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
@@ -647,7 +653,7 @@ export default function App() {
                           style={{ padding: '0.2rem 0.6rem', fontSize: '0.65rem' }}
                           onClick={toggleDjLoop}
                         >
-                          {isLoopingBeat ? 'STOP LOOP' : 'AUTO-PLAY LOOP'}
+                          {isLoopingBeat ? 'STOP LOOP' : 'AUTOPLAY LOOP'}
                         </button>
                       </div>
 
@@ -666,7 +672,7 @@ export default function App() {
                           onClick={() => triggerDjPad('hihat')}
                         >
                           <span className="dj-pad-key">[2]</span>
-                          <span className="dj-pad-name">HI-HAT</span>
+                          <span className="dj-pad-name">HI HAT</span>
                         </button>
                         <button
                           type="button"
@@ -737,9 +743,7 @@ export default function App() {
         })}
       </main>
 
-      {/* ====================================================================
-          BOTTOM HUD FOOTER TELEMETRY
-         ==================================================================== */}
+      {/* Bottom HUD Footer Telemetry */}
       <footer className="manga-hud-footer">
         <div className="hud-hint">
           <Terminal size={14} />
@@ -762,9 +766,7 @@ export default function App() {
         </div>
       </footer>
 
-      {/* ====================================================================
-          CAMPUS VENUE MAP MODAL
-         ==================================================================== */}
+      {/* Campus Venue Map Modal */}
       {campusMapOpen && (
         <div 
           className="dossier-modal-overlay"
@@ -822,9 +824,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ====================================================================
-          MANGA DOSSIER MODAL
-         ==================================================================== */}
+      {/* Manga Dossier Modal */}
       {selectedDossier && (
         <div 
           className="dossier-modal-overlay"
@@ -890,9 +890,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ====================================================================
-          CUSTOM MANGA CYBER-PASS GENERATOR
-         ==================================================================== */}
+      {/* Custom Manga Cyber Pass Generator */}
       {passModalOpen && (
         <div 
           className="dossier-modal-overlay"
@@ -905,7 +903,7 @@ export default function App() {
           >
             <div className="dossier-header">
               <span style={{ fontFamily: 'var(--font-manga)', fontSize: '0.95rem' }}>
-                🎟️ CUSTOM MANGA CYBER-PASS GENERATOR
+                🎟️ CUSTOM MANGA CYBER PASS GENERATOR
               </span>
               <button 
                 type="button"
@@ -938,7 +936,7 @@ export default function App() {
                       COLLEGE: {passData.college || 'IIT BOMBAY'}
                     </div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#AAAAAA' }}>
-                      ID TOKEN: {passData.roll || 'TF-2026-X01'}
+                      ID TOKEN: {passData.roll || 'TF 2026 X01'}
                     </div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#FFFFFF', marginTop: '0.25rem' }}>
                       DIVISION: {passData.avatar}
@@ -1011,7 +1009,7 @@ export default function App() {
                   SELECT CYBER DIVISION
                 </label>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  {['TITAN MECH', 'SWARM FALCON', 'CYBER-SAMURAI', 'QUANTUM BIO-HACKER'].map((av) => (
+                  {['TITAN MECH', 'SWARM FALCON', 'CYBER SAMURAI', 'QUANTUM BIO HACKER'].map((av) => (
                     <button
                       key={av}
                       type="button"
