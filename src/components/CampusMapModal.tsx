@@ -39,21 +39,13 @@ export default function CampusMapModal({ onClose, onWarp }: Props) {
 
           <div className="campus-map-grid">
             {CAMPUS_VENUES.map((v) => (
-              <div
+              <button
                 key={v.name}
+                type="button"
                 className="venue-card"
-                role="button"
-                tabIndex={0}
                 onClick={() => {
                   onClose();
                   onWarp(v.realmIndex);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onClose();
-                    onWarp(v.realmIndex);
-                  }
                 }}
               >
                 <div className="venue-top-row">
@@ -62,7 +54,7 @@ export default function CampusMapModal({ onClose, onWarp }: Props) {
                 </div>
                 <div className="venue-name">{v.name}</div>
                 <div className="venue-event">{v.event}</div>
-              </div>
+              </button>
             ))}
           </div>
         </div>

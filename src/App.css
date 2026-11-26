@@ -469,9 +469,13 @@
 }
 
 .venue-card {
+  width: 100%;
   background: #111111;
   border: 2px solid var(--paper-white);
+  color: inherit;
+  font: inherit;
   padding: 1rem;
+  text-align: left;
   cursor: pointer;
   transition: all 0.2s;
 }
