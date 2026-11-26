@@ -27,7 +27,7 @@ export default function App() {
     playSfx
   );
   const { djBeatTrigger, isLoopingBeat, triggerDjPad, toggleDjLoop } = useDjSequencer(playSfx);
-  const { modalState, modalActions } = useModals();
+  const { modalState, modalActions, anyOpen: modalOpen } = useModals();
 
   const [cameraMode, setCameraMode] = useState<CameraMode>('scroll');
   const [droneFormation, setDroneFormation] = useState<DroneFormation>('sphere');
@@ -123,6 +123,7 @@ export default function App() {
           droneFormation={droneFormation}
           djBeatTrigger={djBeatTrigger}
           botControl={botControl}
+          paused={modalOpen}
           onBotGoal={handleBotGoal}
         />
       </Suspense>

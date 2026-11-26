@@ -4,7 +4,9 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 
 vi.mock('./ThreeScene', () => ({
-  default: () => <div data-testid="three-scene" />,
+  default: ({ paused }: { paused: boolean }) => (
+    <div data-testid="three-scene" data-paused={paused} />
+  ),
 }));
 
 async function renderApp() {
@@ -51,8 +53,10 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: 'Open campus venue map' }));
     const dialog = screen.getByRole('dialog', { name: 'Campus venue map' });
     expect(within(dialog).getByText('GYMKHANA GROUNDS')).toBeInTheDocument();
+    expect(screen.getByTestId('three-scene')).toHaveAttribute('data-paused', 'true');
     await user.click(within(dialog).getByRole('button', { name: 'Close campus map' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByTestId('three-scene')).toHaveAttribute('data-paused', 'false');
   });
 
   it('closes the campus map with Escape and restores focus', async () => {
@@ -144,8 +148,9 @@ describe('App', () => {
       expect(screen.getByRole('button', { name: '02 // 闘魂' })).toHaveClass('active');
     });
 
-    fireEvent.keyDown(window, { key: 'd' });
     fireEvent.click(screen.getByRole('button', { name: /ENTER COCKPIT/ }));
+    expect(screen.getByText(/SPEED: 1.2 M\/S/)).toBeInTheDocument();
+    fireEvent.keyDown(window, { key: 'd' });
     expect(screen.getByText(/SPEED: 3.8 M\/S/)).toBeInTheDocument();
     fireEvent.keyUp(window, { key: 'd' });
     expect(screen.getByText(/SPEED: 1.2 M\/S/)).toBeInTheDocument();

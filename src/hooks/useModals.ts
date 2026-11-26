@@ -65,5 +65,5 @@ export function useModals() {
     []
   );
 
-  return { modalState: state, modalActions: actions };
+  return { modalState: state, modalActions: actions, anyOpen };
 }

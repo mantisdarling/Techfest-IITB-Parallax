@@ -18,6 +18,7 @@ export interface ThreeSceneProps {
   droneFormation: DroneFormation;
   djBeatTrigger: boolean;
   botControl: BotControl;
+  paused: boolean;
   onBotGoal: () => void;
 }
 
@@ -27,6 +28,7 @@ function ThreeScene({
   droneFormation,
   djBeatTrigger,
   botControl,
+  paused,
   onBotGoal,
 }: ThreeSceneProps) {
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -36,6 +38,18 @@ function ThreeScene({
   const djBeatRef = useRef(djBeatTrigger);
   const botControlRef = useRef(botControl);
   const onBotGoalRef = useRef(onBotGoal);
+  const pausedRef = useRef(paused);
+  const renderControlRef = useRef<{ start: () => void; stop: () => void } | null>(null);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
+
+  useEffect(() => {
+    const controls = renderControlRef.current;
+    if (paused || document.hidden) controls?.stop();
+    else controls?.start();
+  }, [paused]);
 
   useEffect(() => {
     scrollRef.current = scrollProgress;
@@ -92,14 +106,14 @@ function ThreeScene({
     };
 
     const start = () => {
-      if (animationFrameId || document.hidden) return;
+      if (animationFrameId || document.hidden || pausedRef.current) return;
       lastFrameTime = null;
       animationFrameId = requestAnimationFrame(animate);
     };
 
     const animate = (time: number) => {
       animationFrameId = 0;
-      if (document.hidden) return;
+      if (document.hidden || pausedRef.current) return;
       if (lastFrameTime !== null && time - lastFrameTime < frameInterval) {
         animationFrameId = requestAnimationFrame(animate);
         return;
@@ -133,9 +147,11 @@ function ThreeScene({
       else start();
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
+    renderControlRef.current = { start, stop };
     start();
 
     return () => {
+      renderControlRef.current = null;
       stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
       detachResize();
