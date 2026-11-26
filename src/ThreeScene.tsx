@@ -10,6 +10,7 @@ import {
 } from './three/realms';
 import { attachDragControls } from './three/input';
 import { updateWorld } from './three/animation';
+import { resolveRenderQuality } from './three/quality';
 
 export interface ThreeSceneProps {
   scrollProgress: number;
@@ -59,11 +60,18 @@ function ThreeScene({
     const container = mountRef.current;
     if (!container) return;
 
-    const ctx = createScene(container);
+    const deviceNavigator = navigator as Navigator & { deviceMemory?: number };
+    const quality = resolveRenderQuality({
+      devicePixelRatio: window.devicePixelRatio,
+      deviceMemory: deviceNavigator.deviceMemory,
+      hardwareConcurrency: deviceNavigator.hardwareConcurrency,
+      coarsePointer: window.matchMedia('(pointer: coarse)').matches,
+    });
+    const ctx = createScene(container, quality);
     const objects: SceneObjects = {};
     const loader = new THREE.TextureLoader();
 
-    buildStarfield(ctx.scene);
+    buildStarfield(ctx.scene, quality.starCount);
     buildGatewayRealm(ctx.scene, objects, loader);
     buildRobowarsRealm(ctx.scene, objects, loader);
     buildDroneRealm(ctx.scene, objects, loader);

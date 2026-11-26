@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { DroneFormation } from '../types';
+import { DEFAULT_RENDER_QUALITY, type RenderQuality } from './quality';
 
 export interface SceneObjects {
   realm1?: THREE.Group;
@@ -25,7 +26,10 @@ export interface SceneContext {
   dispose: () => void;
 }
 
-export function createScene(container: HTMLElement): SceneContext {
+export function createScene(
+  container: HTMLElement,
+  quality: RenderQuality = DEFAULT_RENDER_QUALITY
+): SceneContext {
   const width = container.clientWidth;
   const height = container.clientHeight;
 
@@ -38,12 +42,12 @@ export function createScene(container: HTMLElement): SceneContext {
   camera.position.set(0, 0, 400);
 
   const renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    antialias: quality.antialias,
     alpha: false,
     powerPreference: 'high-performance',
   });
   renderer.setSize(width, height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(quality.pixelRatio);
   renderer.toneMapping = THREE.NoToneMapping;
   container.appendChild(renderer.domElement);
 
@@ -71,8 +75,7 @@ export function createScene(container: HTMLElement): SceneContext {
   return { scene, camera, renderer, dispose };
 }
 
-export function buildStarfield(scene: THREE.Scene): void {
-  const particleCount = 1400;
+export function buildStarfield(scene: THREE.Scene, particleCount = 1400): void {
   const positions = new Float32Array(particleCount * 3);
   for (let i = 0; i < particleCount * 3; i += 3) {
     positions[i] = (Math.random() - 0.5) * 1800;
