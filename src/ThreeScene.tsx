@@ -85,9 +85,25 @@ function ThreeScene({
     let lastFrameTime: number | null = null;
     let elapsedTime = 0;
 
-    const animate = (time: number) => {
+    const stop = () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      animationFrameId = 0;
+      lastFrameTime = null;
+    };
+
+    const start = () => {
+      if (animationFrameId || document.hidden) return;
+      lastFrameTime = null;
       animationFrameId = requestAnimationFrame(animate);
-      if (lastFrameTime !== null && time - lastFrameTime < frameInterval) return;
+    };
+
+    const animate = (time: number) => {
+      animationFrameId = 0;
+      if (document.hidden) return;
+      if (lastFrameTime !== null && time - lastFrameTime < frameInterval) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+      }
       const dt = lastFrameTime === null ? 1 / 60 : Math.min((time - lastFrameTime) / 1000, 0.05);
       lastFrameTime = time;
       elapsedTime += dt;
@@ -109,11 +125,19 @@ function ThreeScene({
       );
 
       ctx.renderer.render(ctx.scene, ctx.camera);
+      animationFrameId = requestAnimationFrame(animate);
     };
-    animate(performance.now());
+
+    const onVisibilityChange = () => {
+      if (document.hidden) stop();
+      else start();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    start();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      stop();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       detachResize();
       drag.dispose();
       ctx.dispose();
