@@ -70,6 +70,7 @@ body {
   background-color: var(--ink-black);
   color: var(--paper-white);
   min-height: 100vh;
+  min-height: 100svh;
   position: relative;
   overflow-x: hidden;
 }
