@@ -9,7 +9,12 @@ interface Props {
 }
 
 function sanitizePassText(value: string, maxLength: number): string {
-  return value.replace(/[\u0000-\u001f\u007f-\u009f]/g, '').slice(0, maxLength);
+  let sanitized = '';
+  for (const character of value) {
+    const code = character.codePointAt(0) ?? 0;
+    if (code > 31 && (code < 127 || code > 159)) sanitized += character;
+  }
+  return sanitized.slice(0, maxLength);
 }
 
 export default function PassModal({ onClose }: Props) {
