@@ -723,6 +723,7 @@
 
 .cockpit-exit-row {
   text-align: center;
+  pointer-events: auto;
 }
 
 .rover-title {
