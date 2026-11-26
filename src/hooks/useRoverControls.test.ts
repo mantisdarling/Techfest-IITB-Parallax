@@ -19,6 +19,21 @@ describe('useRoverControls', () => {
     expect(result.current.botControl).toEqual({ x: 0, z: 0, active: false });
   });
 
+  it('neutralizes steering outside the arena and still listens for key release', () => {
+    const playSfx = vi.fn();
+    const { result, rerender } = renderHook(({ realm }) => useRoverControls(realm, playSfx), {
+      initialProps: { realm: 1 },
+    });
+    fireEvent.keyDown(window, { key: 'd' });
+    expect(result.current.botControl.active).toBe(true);
+
+    rerender({ realm: 0 });
+    expect(result.current.botControl).toEqual({ x: 0, z: 0, active: false });
+    fireEvent.keyUp(window, { key: 'd' });
+    rerender({ realm: 1 });
+    expect(result.current.botControl).toEqual({ x: 0, z: 0, active: false });
+  });
+
   it('releases steering when the window loses focus', () => {
     const { result } = renderHook(() => useRoverControls(1, vi.fn()));
     fireEvent.keyDown(window, { key: 'd' });

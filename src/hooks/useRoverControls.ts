@@ -9,13 +9,8 @@ export function useRoverControls(activeRealmIndex: number, playSfx: PlaySfx) {
   const [botGoalAchieved, setBotGoalAchieved] = useState(false);
 
   useEffect(() => {
-    if (activeRealmIndex !== 1) {
-      setBotControl(IDLE_CONTROL);
-      return;
-    }
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat) return;
+      if (activeRealmIndex !== 1 || e.repeat) return;
       const target = e.target;
       if (
         target instanceof HTMLElement &&
@@ -51,5 +46,10 @@ export function useRoverControls(activeRealmIndex: number, playSfx: PlaySfx) {
     };
   }, [activeRealmIndex, playSfx]);
 
-  return { botControl, setBotControl, botGoalAchieved, setBotGoalAchieved };
+  return {
+    botControl: activeRealmIndex === 1 ? botControl : IDLE_CONTROL,
+    setBotControl,
+    botGoalAchieved,
+    setBotGoalAchieved,
+  };
 }
