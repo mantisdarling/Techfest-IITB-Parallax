@@ -14,15 +14,19 @@ export function attachDragControls(
   cameraModeRef: { current: CameraMode }
 ): DragControls {
   const isDragging = { current: false };
+  let activePointerId: number | null = null;
   let prev = { x: 0, y: 0 };
 
-  const onMouseDown = (e: MouseEvent) => {
+  const onPointerDown = (e: PointerEvent) => {
+    if (!e.isPrimary || e.button !== 0) return;
+    activePointerId = e.pointerId;
     isDragging.current = true;
     prev = { x: e.clientX, y: e.clientY };
+    dom.setPointerCapture(e.pointerId);
   };
 
-  const onMouseMove = (e: MouseEvent) => {
-    if (!isDragging.current) return;
+  const onPointerMove = (e: PointerEvent) => {
+    if (!isDragging.current || e.pointerId !== activePointerId) return;
     const dx = e.clientX - prev.x;
     const dy = e.clientY - prev.y;
 
@@ -36,20 +40,33 @@ export function attachDragControls(
     prev = { x: e.clientX, y: e.clientY };
   };
 
-  const onMouseUp = () => {
+  const endDrag = (e: PointerEvent) => {
+    if (e.pointerId !== activePointerId) return;
     isDragging.current = false;
+    activePointerId = null;
+    if (dom.hasPointerCapture(e.pointerId)) dom.releasePointerCapture(e.pointerId);
   };
 
-  dom.addEventListener('mousedown', onMouseDown);
-  window.addEventListener('mousemove', onMouseMove);
-  window.addEventListener('mouseup', onMouseUp);
+  dom.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+  dom.addEventListener('lostpointercapture', endDrag);
+  dom.addEventListener('contextmenu', preventContextMenu);
+
+  function preventContextMenu(e: Event) {
+    e.preventDefault();
+  }
 
   return {
     isDragging,
     dispose: () => {
-      dom.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      dom.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
+      dom.removeEventListener('lostpointercapture', endDrag);
+      dom.removeEventListener('contextmenu', preventContextMenu);
     },
   };
 }
