@@ -38,6 +38,42 @@ describe('updateWorld', () => {
     (swarm.material as THREE.Material).dispose();
   });
 
+  it('snaps formations and skips ambient motion when reduced motion is requested', () => {
+    const camera = new THREE.PerspectiveCamera();
+    camera.position.z = -1000;
+    const positions = new Float32Array([0, 0, 0]);
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const swarm = new THREE.Points(geometry, new THREE.PointsMaterial());
+    const target = new Float32Array([10, 10, 10]);
+    const ring = new THREE.Mesh();
+    const objects: SceneObjects = {
+      realm1: new THREE.Group(),
+      realm3: new THREE.Group(),
+      ring1: ring,
+      droneSwarmMesh: swarm,
+      morphTargets: { sphere: target, tf: target, falcon: target, helix: target },
+    };
+
+    updateWorld(
+      objects,
+      camera,
+      { ...state, droneFormation: 'tf', reducedMotion: true },
+      1 / 60,
+      1
+    );
+
+    expect(Array.from(positions)).toEqual([10, 10, 10]);
+    expect(swarm.userData.settledFormation).toBe('tf');
+    expect(swarm.rotation.y).toBe(0);
+
+    camera.position.z = 400;
+    updateWorld(objects, camera, { ...state, reducedMotion: true }, 1 / 60, 1);
+    expect(ring.rotation.z).toBe(0);
+    geometry.dispose();
+    (swarm.material as THREE.Material).dispose();
+  });
+
   it('does not upload drone positions after a formation settles', () => {
     const camera = new THREE.PerspectiveCamera();
     camera.position.z = -1000;

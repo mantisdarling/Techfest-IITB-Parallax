@@ -75,6 +75,20 @@ body {
   overflow-x: hidden;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Authentic Halftone Screentone Pattern (Zero smooth gradients, pure discrete dot matrix) */
 .screentone-bg {
   background-image: radial-gradient(#ffffff 1px, transparent 1px);

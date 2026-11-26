@@ -39,9 +39,11 @@ export default function App() {
       flashSpeedlines(500);
       const target = REALM_DATA[index];
       if (target) {
+        const reduceMotion =
+          window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
         document
           .getElementById(target.id)
-          ?.scrollIntoView({ behavior: immediate ? 'auto' : 'smooth' });
+          ?.scrollIntoView({ behavior: immediate || reduceMotion ? 'auto' : 'smooth' });
       }
     },
     [playSfx, flashSpeedlines]

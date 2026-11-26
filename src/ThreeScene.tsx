@@ -39,6 +39,7 @@ function ThreeScene({
   const botControlRef = useRef(botControl);
   const onBotGoalRef = useRef(onBotGoal);
   const pausedRef = useRef(paused);
+  const reducedMotionRef = useRef(false);
   const renderControlRef = useRef<{ start: () => void; stop: () => void } | null>(null);
 
   useEffect(() => {
@@ -73,6 +74,13 @@ function ThreeScene({
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reducedMotionRef.current = motionQuery.matches;
+    const onMotionChange = () => {
+      reducedMotionRef.current = motionQuery.matches;
+    };
+    motionQuery.addEventListener('change', onMotionChange);
 
     const deviceNavigator = navigator as Navigator & { deviceMemory?: number };
     const quality = resolveRenderQuality({
@@ -132,6 +140,7 @@ function ThreeScene({
           djBeat: djBeatRef.current,
           botControl: botControlRef.current,
           isDragging: drag.isDragging.current,
+          reducedMotion: reducedMotionRef.current,
         },
         dt,
         elapsedTime,
@@ -154,6 +163,7 @@ function ThreeScene({
       renderControlRef.current = null;
       stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      motionQuery.removeEventListener('change', onMotionChange);
       detachResize();
       drag.dispose();
       ctx.dispose();

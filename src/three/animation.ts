@@ -19,6 +19,7 @@ export interface WorldState {
   djBeat: boolean;
   botControl: BotControl | null;
   isDragging: boolean;
+  reducedMotion?: boolean;
 }
 
 export function updateWorld(
@@ -31,26 +32,27 @@ export function updateWorld(
 ): void {
   const factor = 1.0 - Math.exp(-9.0 * dt);
   const visibility = realmVisibility(camera.position.z);
+  const reducedMotion = state.reducedMotion === true;
 
-  if (visibility.realm1 && objects.ring1) {
+  if (!reducedMotion && visibility.realm1 && objects.ring1) {
     objects.ring1.rotation.z += 1.0 * dt;
   }
 
-  if (visibility.realm2 && objects.goalMesh) {
+  if (!reducedMotion && visibility.realm2 && objects.goalMesh) {
     objects.goalMesh.rotation.y += 2.5 * dt;
     objects.goalMesh.rotation.x += 1.2 * dt;
   }
 
-  if (visibility.realm2) updateRover(objects, state, dt, elapsedTime, onBotGoal);
-  if (visibility.realm3) updateDroneSwarm(objects, state, dt);
-  if (visibility.realm4) updateStage(objects, state, elapsedTime);
+  if (visibility.realm2) updateRover(objects, state, dt, elapsedTime, onBotGoal, reducedMotion);
+  if (visibility.realm3) updateDroneSwarm(objects, state, dt, reducedMotion);
+  if (visibility.realm4) updateStage(objects, state, elapsedTime, reducedMotion);
 
   if (objects.realm1) objects.realm1.visible = visibility.realm1;
   if (objects.realm2) objects.realm2.visible = visibility.realm2;
   if (objects.realm3) objects.realm3.visible = visibility.realm3;
   if (objects.realm4) objects.realm4.visible = visibility.realm4;
 
-  updateCamera(objects, camera, state, dt, elapsedTime, factor);
+  updateCamera(objects, camera, state, dt, elapsedTime, factor, reducedMotion);
 }
 
 function updateRover(
@@ -58,7 +60,8 @@ function updateRover(
   state: WorldState,
   dt: number,
   elapsedTime: number,
-  onBotGoal?: () => void
+  onBotGoal?: () => void,
+  reducedMotion = false
 ): void {
   const bot = objects.bot;
   if (!bot) return;
@@ -73,21 +76,25 @@ function updateRover(
     if (isGoalReached(bot.position.x, bot.position.z) && onBotGoal) {
       onBotGoal();
     }
-  } else {
-    // Autonomous LiDAR patrol
+  } else if (!reducedMotion) {
     bot.position.x = Math.sin(elapsedTime * 1.5) * 45;
     bot.position.z = Math.cos(elapsedTime * 1.5) * 35;
     bot.rotation.y = elapsedTime * 1.5 + Math.PI / 2;
   }
 
-  if (objects.lidar) objects.lidar.rotation.y += 5.0 * dt;
-  if (objects.radar) {
+  if (!reducedMotion && objects.lidar) objects.lidar.rotation.y += 5.0 * dt;
+  if (!reducedMotion && objects.radar) {
     const s = 1.0 + Math.sin(elapsedTime * 6) * 0.35;
     objects.radar.scale.set(s, s, 1);
   }
 }
 
-function updateDroneSwarm(objects: SceneObjects, state: WorldState, dt: number): void {
+function updateDroneSwarm(
+  objects: SceneObjects,
+  state: WorldState,
+  dt: number,
+  reducedMotion: boolean
+): void {
   const swarm = objects.droneSwarmMesh;
   if (!swarm || !objects.morphTargets) return;
 
@@ -97,37 +104,49 @@ function updateDroneSwarm(objects: SceneObjects, state: WorldState, dt: number):
   const target = objects.morphTargets[formation];
 
   if (swarm.userData.settledFormation !== formation) {
-    const droneLerp = 1.0 - Math.exp(-4.5 * dt);
-    let maxDelta = 0;
-    for (let i = 0; i < positions.length; i++) {
-      const delta = target[i] - positions[i];
-      positions[i] += delta * droneLerp;
-      maxDelta = Math.max(maxDelta, Math.abs(delta));
-    }
-    if (maxDelta < 0.01) {
+    if (reducedMotion) {
       positions.set(target);
       swarm.userData.settledFormation = formation;
+    } else {
+      const droneLerp = 1.0 - Math.exp(-4.5 * dt);
+      let maxDelta = 0;
+      for (let i = 0; i < positions.length; i++) {
+        const delta = target[i] - positions[i];
+        positions[i] += delta * droneLerp;
+        maxDelta = Math.max(maxDelta, Math.abs(delta));
+      }
+      if (maxDelta < 0.01) {
+        positions.set(target);
+        swarm.userData.settledFormation = formation;
+      }
     }
     attr.needsUpdate = true;
   }
 
-  if (!state.isDragging) {
+  if (!reducedMotion && !state.isDragging) {
     swarm.rotation.y += 0.25 * dt;
     if (objects.sphereWire) objects.sphereWire.rotation.y += 0.15 * dt;
   }
 }
 
-function updateStage(objects: SceneObjects, state: WorldState, elapsedTime: number): void {
+function updateStage(
+  objects: SceneObjects,
+  state: WorldState,
+  elapsedTime: number,
+  reducedMotion: boolean
+): void {
   if (!objects.eqBars) return;
   const beatBoost = state.djBeat ? 2.5 : 1.0;
   objects.eqBars.forEach((bar, idx) => {
-    const h = (10 + Math.abs(Math.sin(elapsedTime * 6 + idx * 0.6)) * 40) * beatBoost;
+    const pulse = reducedMotion ? 0 : Math.abs(Math.sin(elapsedTime * 6 + idx * 0.6)) * 40;
+    const h = (10 + pulse) * beatBoost;
     bar.scale.y = h / 20;
     bar.position.y = -50 + h / 2;
   });
 
-  objects.monoliths?.forEach((m, idx) => {
-    m.scale.y = 1.0 + (state.djBeat ? 0.35 : 0) + Math.sin(elapsedTime * 4 + idx) * 0.08;
+  objects.monoliths?.forEach((monolith, idx) => {
+    const pulse = reducedMotion ? 0 : Math.sin(elapsedTime * 4 + idx) * 0.08;
+    monolith.scale.y = 1.0 + (state.djBeat ? 0.35 : 0) + pulse;
   });
 }
 
@@ -137,7 +156,8 @@ function updateCamera(
   state: WorldState,
   dt: number,
   elapsedTime: number,
-  factor: number
+  factor: number,
+  reducedMotion: boolean
 ): void {
   const mode = state.cameraMode;
   if (mode === 'cockpit' && objects.bot) {
@@ -150,7 +170,7 @@ function updateCamera(
     camera.position.z -= FPV_SPEED * dt;
     if (camera.position.z < FPV_MIN_Z) camera.position.z = FPV_RESET_Z;
   } else if (mode === 'orbit') {
-    const angle = elapsedTime * 0.25;
+    const angle = reducedMotion ? 0 : elapsedTime * 0.25;
     camera.position.x = Math.sin(angle) * ORBIT_RADIUS;
     camera.position.z = ORBIT_CENTER_Z + Math.cos(angle) * ORBIT_RADIUS;
     camera.position.y = 80;
