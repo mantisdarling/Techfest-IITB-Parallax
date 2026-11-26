@@ -55,9 +55,20 @@ function DpadButton({
       type="button"
       className="dpad-btn"
       aria-label={label}
-      onMouseDown={() => onSteer({ x, z, active: true })}
-      onMouseUp={onRelease}
-      onMouseLeave={onRelease}
+      onPointerDown={(e) => {
+        if (!e.isPrimary || e.button !== 0) return;
+        e.currentTarget.setPointerCapture(e.pointerId);
+        onSteer({ x, z, active: true });
+      }}
+      onPointerUp={(e) => {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+        onRelease();
+      }}
+      onPointerCancel={onRelease}
+      onLostPointerCapture={onRelease}
+      onContextMenu={(e) => e.preventDefault()}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -67,9 +78,6 @@ function DpadButton({
       onKeyUp={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onRelease();
       }}
-      onTouchStart={() => onSteer({ x, z, active: true })}
-      onTouchEnd={onRelease}
-      onTouchCancel={onRelease}
     >
       <Icon size={16} />
     </button>
