@@ -669,12 +669,13 @@
   width: 100vw;
   height: 100vh;
   z-index: 0;
-  touch-action: none;
+  touch-action: pan-y;
   cursor: grab;
 }
 
 .three-mount.free-look {
   cursor: crosshair;
+  touch-action: none;
 }
 
 .scene-loading {
