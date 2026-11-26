@@ -1,11 +1,11 @@
 :root {
   --ink-black: #000000;
-  --paper-white: #FFFFFF;
+  --paper-white: #ffffff;
   --charcoal: #121212;
   --screentone: #262626;
-  --border-thick: 3px solid #FFFFFF;
+  --border-thick: 3px solid #ffffff;
   --border-black: 3px solid #000000;
-  
+
   --font-manga: 'Dela Gothic One', cursive, sans-serif;
   --font-display: 'Syne', sans-serif;
   --font-body: 'Space Grotesk', sans-serif;
@@ -56,11 +56,7 @@ body {
   z-index: 5;
   opacity: 0;
   transition: opacity 0.25s ease-out;
-  background: repeating-conic-gradient(
-    from 0deg,
-    #ffffff 0deg 0.5deg,
-    transparent 0.5deg 5deg
-  );
+  background: repeating-conic-gradient(from 0deg, #ffffff 0deg 0.5deg, transparent 0.5deg 5deg);
   mask-image: radial-gradient(circle, transparent 35%, black 85%);
   -webkit-mask-image: radial-gradient(circle, transparent 35%, black 85%);
 }
@@ -84,7 +80,10 @@ body {
   border: 3px solid var(--paper-white);
   cursor: pointer;
   text-decoration: none;
-  transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
   box-shadow: 4px 4px 0px #333333;
 }
 
@@ -92,7 +91,7 @@ body {
   background-color: var(--ink-black);
   color: var(--paper-white);
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px #FFFFFF;
+  box-shadow: 6px 6px 0px #ffffff;
 }
 
 .manga-btn-outline {
@@ -121,7 +120,9 @@ body {
 .manga-kanji {
   font-family: var(--font-manga);
   color: var(--paper-white);
-  text-shadow: 3px 3px 0px #000000, -1px -1px 0px #FFFFFF;
+  text-shadow:
+    3px 3px 0px #000000,
+    -1px -1px 0px #ffffff;
   user-select: none;
 }
 
@@ -133,7 +134,7 @@ body {
   background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: #FFFFFF;
+  background: #ffffff;
 }
 
 @media (prefers-reduced-motion: reduce) {

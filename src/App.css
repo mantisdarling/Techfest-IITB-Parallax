@@ -61,7 +61,7 @@
   font-family: var(--font-mono);
   font-size: 0.65rem;
   letter-spacing: 0.15em;
-  color: #AAAAAA;
+  color: #aaaaaa;
 }
 
 /* Realm Nav Pills */
@@ -77,7 +77,7 @@
   padding: 0.35rem 0.75rem;
   border: 1px solid #444444;
   background-color: #000000;
-  color: #CCCCCC;
+  color: #cccccc;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -202,7 +202,7 @@
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.6;
-  color: #CCCCCC;
+  color: #cccccc;
   margin-bottom: 1.5rem;
 }
 
@@ -227,7 +227,7 @@
 }
 
 .spec-val {
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 700;
 }
 
@@ -242,7 +242,7 @@
   color: var(--ink-black);
   padding: 0.1rem 0.8rem;
   border: 3px solid #000000;
-  box-shadow: 4px 4px 0px #FFFFFF;
+  box-shadow: 4px 4px 0px #ffffff;
   transform: rotate(6deg);
   cursor: pointer;
   user-select: none;
@@ -268,7 +268,7 @@
 .formation-btn {
   background: #111111;
   border: 1.5px solid #555555;
-  color: #CCCCCC;
+  color: #cccccc;
   padding: 0.4rem 0.75rem;
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -304,16 +304,17 @@
 
 .dpad-btn {
   background: #000000;
-  border: 1.5px solid #FFFFFF;
-  color: #FFFFFF;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   user-select: none;
 }
-.dpad-btn:hover, .dpad-btn:active {
-  background: #FFFFFF;
+.dpad-btn:hover,
+.dpad-btn:active {
+  background: #ffffff;
   color: #000000;
 }
 
@@ -386,7 +387,7 @@
 .cockpit-reticle-center::after {
   content: '';
   position: absolute;
-  background: #FFFFFF;
+  background: #ffffff;
 }
 .cockpit-reticle-center::before {
   width: 40px;
@@ -402,10 +403,10 @@
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.15em;
-  color: #FFFFFF;
+  color: #ffffff;
   background: rgba(0, 0, 0, 0.7);
   padding: 0.6rem 1rem;
-  border: 1px solid #FFFFFF;
+  border: 1px solid #ffffff;
   display: inline-block;
 }
 
@@ -430,7 +431,7 @@
 .venue-card:hover {
   background: #222222;
   transform: translateY(-2px);
-  border-color: #FFFFFF;
+  border-color: #ffffff;
 }
 
 /* ==========================================================================
@@ -454,7 +455,7 @@
   font-family: var(--font-mono);
   font-size: 0.72rem;
   letter-spacing: 0.1em;
-  color: #AAAAAA;
+  color: #aaaaaa;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -569,7 +570,7 @@
 /* Pass Ticket Layout */
 .ticket-canvas-frame {
   background: #000000;
-  border: 3px solid #FFFFFF;
+  border: 3px solid #ffffff;
   padding: 1.5rem;
   position: relative;
   background-image: radial-gradient(#ffffff 1px, transparent 1px);
@@ -580,7 +581,7 @@
 .ticket-header-row {
   display: flex;
   justify-content: space-between;
-  border-bottom: 2px solid #FFFFFF;
+  border-bottom: 2px solid #ffffff;
   padding-bottom: 0.75rem;
   margin-bottom: 1rem;
 }
@@ -615,7 +616,7 @@
   .manga-hud-header {
     padding: 0.75rem 1rem;
   }
-  
+
   .camera-mode-group {
     display: none;
   }
@@ -656,4 +657,310 @@
     width: 100%;
     justify-content: space-between;
   }
+}
+
+/* ==========================================================================
+   EXTRACTED COMPONENT STYLES (previously inline)
+   ========================================================================== */
+.three-mount {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  touch-action: none;
+  cursor: grab;
+}
+
+.three-mount.free-look {
+  cursor: crosshair;
+}
+
+.scene-loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ink-black);
+  color: var(--paper-white);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  z-index: 0;
+}
+
+.error-fallback {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--ink-black);
+  color: var(--paper-white);
+  font-family: var(--font-manga);
+}
+
+.hud-pass-btn {
+  padding: 0.45rem 1rem;
+  font-size: 0.75rem;
+}
+
+.cockpit-hud-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cockpit-reticle-label {
+  position: absolute;
+  bottom: -22px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.cockpit-exit-row {
+  text-align: center;
+}
+
+.rover-title {
+  font-family: var(--font-manga);
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+}
+
+.rover-hint {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #aaaaaa;
+}
+
+.rover-goal {
+  color: #ffffff;
+  font-family: var(--font-manga);
+  margin-top: 0.4rem;
+}
+
+.dpad-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+}
+
+.formation-label {
+  font-family: var(--font-manga);
+  font-size: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.dj-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.dj-title {
+  font-family: var(--font-manga);
+  font-size: 0.8rem;
+}
+
+.dj-loop-btn {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.65rem;
+}
+
+.realm-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.modal-intro {
+  color: #aaaaaa;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.venue-top-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.venue-icon {
+  font-size: 0.7rem;
+}
+
+.venue-cap {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.venue-name {
+  font-family: var(--font-manga);
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+}
+
+.venue-event {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #cccccc;
+}
+
+.dossier-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dossier-logo {
+  font-size: 0.85rem;
+}
+
+.dossier-title {
+  font-family: var(--font-manga);
+  font-size: 1rem;
+}
+
+.dossier-desc {
+  font-family: var(--font-body);
+  line-height: 1.7;
+  color: #cccccc;
+  margin-bottom: 1.5rem;
+}
+
+.dossier-spec-val {
+  font-size: 0.9rem;
+}
+
+.dossier-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.pass-card {
+  max-width: 640px;
+}
+
+.pass-title {
+  font-family: var(--font-manga);
+  font-size: 0.95rem;
+}
+
+.ticket-logo {
+  font-size: 0.75rem;
+}
+
+.ticket-official-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  margin-left: 0.5rem;
+  letter-spacing: 0.15em;
+}
+
+.ticket-iitb {
+  font-family: var(--font-manga);
+  font-size: 0.8rem;
+}
+
+.ticket-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.ticket-name {
+  font-family: var(--font-manga);
+  font-size: 1.35rem;
+  text-transform: uppercase;
+}
+
+.ticket-meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #aaaaaa;
+}
+
+.ticket-division {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #ffffff;
+  margin-top: 0.25rem;
+}
+
+.ticket-qr {
+  border: 2px solid #ffffff;
+  padding: 0.5rem;
+  background: #ffffff;
+  color: #000000;
+  text-align: center;
+}
+
+.ticket-qr-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: bold;
+}
+
+.ticket-qr-icon {
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ticket-qr-sub {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+}
+
+.pass-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.pass-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #888888;
+  margin-bottom: 0.3rem;
+}
+
+.pass-division-label {
+  margin-bottom: 0.4rem;
+}
+
+.pass-input {
+  width: 100%;
+  background: #111;
+  border: 2px solid #ffffff;
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.pass-division-section {
+  margin-bottom: 1.5rem;
+}
+
+.pass-division-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pass-save-btn {
+  width: 100%;
 }
