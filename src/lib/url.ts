@@ -8,10 +8,12 @@ export function dossierFromSearch(search: string): RealmData | null {
 }
 
 export function realmIndexFromLocation(search: string, hash: string): number | null {
-  const realmParam = new URLSearchParams(search).get('realm');
-  if (realmParam !== null) {
-    const idx = parseInt(realmParam, 10);
-    if (!isNaN(idx) && idx >= 0 && idx < REALM_DATA.length) return idx;
+  const params = new URLSearchParams(search);
+  const realmParams = params.getAll('realm');
+  if (realmParams.length > 0) {
+    if (realmParams.length !== 1 || !/^(0|[1-9]\d*)$/.test(realmParams[0])) return null;
+    const idx = Number(realmParams[0]);
+    if (idx < REALM_DATA.length) return idx;
     return null;
   }
   if (hash) {

@@ -22,6 +22,10 @@ describe('realmIndexFromLocation', () => {
     expect(realmIndexFromLocation('?realm=9', '#stage')).toBeNull();
     expect(realmIndexFromLocation('?realm=abc', '')).toBeNull();
     expect(realmIndexFromLocation('?realm=-1', '')).toBeNull();
+    expect(realmIndexFromLocation('?realm=1junk', '')).toBeNull();
+    expect(realmIndexFromLocation('?realm=1.9', '')).toBeNull();
+    expect(realmIndexFromLocation('?realm=01', '')).toBeNull();
+    expect(realmIndexFromLocation('?realm=1&realm=2', '')).toBeNull();
   });
 
   it('falls back to a matching hash', () => {
