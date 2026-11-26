@@ -44,18 +44,15 @@ export default function RealmSection({
     <section id={realm.id} className="scroll-realm">
       <div className={`realm-content ${isRight ? 'right-aligned' : ''}`}>
         <div className="manga-panel-card">
-          <div
+          <button
+            type="button"
             className="sound-fx-badge"
             title="Click for Manga SFX Impact!"
-            role="button"
-            tabIndex={0}
+            aria-label={`Play manga sound effect for ${realm.title}`}
             onClick={onSfxBadge}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') onSfxBadge();
-            }}
           >
             {realm.sfx}
-          </div>
+          </button>
 
           <span className="manga-tag">{realm.tag}</span>
           <h2 className="manga-title">{realm.title}</h2>

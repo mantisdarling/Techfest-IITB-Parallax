@@ -28,6 +28,14 @@ describe('App', () => {
     expect(screen.getByText('TECHNOHOLIX MEGASTAGE')).toBeInTheDocument();
   });
 
+  it('exposes every manga sound badge as a native button', async () => {
+    const user = await renderApp();
+    const badges = screen.getAllByRole('button', { name: /Play manga sound effect/ });
+    expect(badges).toHaveLength(4);
+    await user.click(badges[0]);
+    expect(document.querySelector('.speedlines')).toHaveClass('active');
+  });
+
   it('toggles sound effects', async () => {
     const user = await renderApp();
     const sfx = screen.getByRole('button', { name: 'Toggle sound effects' });
