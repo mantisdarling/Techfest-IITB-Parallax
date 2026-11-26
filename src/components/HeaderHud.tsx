@@ -1,6 +1,7 @@
 import { ChevronRight, MapPin, Volume2, VolumeX } from 'lucide-react';
 import { REALM_DATA } from '../data/realms';
 import type { CameraMode } from '../types';
+import MobileNav from './MobileNav';
 
 interface Props {
   activeRealmIndex: number;
@@ -66,6 +67,13 @@ export default function HeaderHud({
           </button>
         ))}
       </div>
+
+      <MobileNav
+        activeRealmIndex={activeRealmIndex}
+        cameraMode={cameraMode}
+        onWarp={onWarp}
+        onCameraModeChange={onCameraModeChange}
+      />
 
       <div className="hud-controls">
         <button
