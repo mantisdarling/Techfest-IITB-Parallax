@@ -137,9 +137,12 @@ export default function App() {
         />
       )}
 
-      <div className="scroll-tracker">
-        <div className="scroll-tracker-fill" style={{ width: `${scrollProgress * 100}%` }} />
-      </div>
+      <progress
+        className="scroll-tracker"
+        value={scrollProgress}
+        max={1}
+        aria-label="Reading progress"
+      />
 
       <HeaderHud
         activeRealmIndex={activeRealmIndex}
