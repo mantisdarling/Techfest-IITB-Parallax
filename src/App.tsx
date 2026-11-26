@@ -104,7 +104,7 @@ export default function App() {
   }, [playSfx, modalActions]);
 
   const handleSteerRelease = useCallback(() => {
-    setBotControl((prev) => ({ ...prev, x: 0, z: 0 }));
+    setBotControl({ x: 0, z: 0, active: false });
   }, [setBotControl]);
 
   const handleExitCockpit = useCallback(() => setCameraMode('scroll'), []);

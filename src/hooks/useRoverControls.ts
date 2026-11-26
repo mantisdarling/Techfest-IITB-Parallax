@@ -9,8 +9,13 @@ export function useRoverControls(activeRealmIndex: number, playSfx: PlaySfx) {
   const [botGoalAchieved, setBotGoalAchieved] = useState(false);
 
   useEffect(() => {
+    if (activeRealmIndex !== 1) {
+      setBotControl(IDLE_CONTROL);
+      return;
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (activeRealmIndex !== 1) return;
+      if (e.repeat) return;
       const target = e.target;
       if (
         target instanceof HTMLElement &&
@@ -20,22 +25,29 @@ export function useRoverControls(activeRealmIndex: number, playSfx: PlaySfx) {
       }
       const dir = keyToDirection(e.key);
       if (dir) {
+        e.preventDefault();
         setBotControl({ x: dir.dx, z: dir.dz, active: true });
         playSfx('click');
       }
     };
 
+    const releaseControls = () => setBotControl(IDLE_CONTROL);
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (isSteeringKey(e.key)) {
-        setBotControl((prev) => ({ ...prev, x: 0, z: 0 }));
-      }
+      if (isSteeringKey(e.key)) releaseControls();
+    };
+    const handleVisibilityChange = () => {
+      if (document.hidden) releaseControls();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', releaseControls);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', releaseControls);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [activeRealmIndex, playSfx]);
 

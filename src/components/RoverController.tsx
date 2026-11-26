@@ -70,7 +70,7 @@ function DpadButton({
       onLostPointerCapture={onRelease}
       onContextMenu={(e) => e.preventDefault()}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (!e.repeat && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           onSteer({ x, z, active: true });
         }
@@ -78,6 +78,7 @@ function DpadButton({
       onKeyUp={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onRelease();
       }}
+      onBlur={onRelease}
     >
       <Icon size={16} />
     </button>

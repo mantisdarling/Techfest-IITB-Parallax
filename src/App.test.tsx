@@ -148,6 +148,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /ENTER COCKPIT/ }));
     expect(screen.getByText(/SPEED: 3.8 M\/S/)).toBeInTheDocument();
     fireEvent.keyUp(window, { key: 'd' });
+    expect(screen.getByText(/SPEED: 1.2 M\/S/)).toBeInTheDocument();
 
     scrollHeightSpy.mockRestore();
     scrollYSpy.mockRestore();
