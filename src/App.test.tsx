@@ -55,6 +55,17 @@ describe('App', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('closes the campus map with Escape and restores focus', async () => {
+    const user = await renderApp();
+    const opener = screen.getByRole('button', { name: 'Open campus venue map' });
+    await user.click(opener);
+    fireEvent.keyDown(screen.getByRole('dialog', { name: 'Campus venue map' }), {
+      key: 'Escape',
+    });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(opener).toHaveFocus();
+  });
+
   it('moves focus into the campus map, traps Tab, and restores focus on close', async () => {
     const user = await renderApp();
     const opener = screen.getByRole('button', { name: 'Open campus venue map' });

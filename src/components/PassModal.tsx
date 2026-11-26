@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function PassModal({ passData, onChange, onClose, onSave }: Props) {
-  const dialogRef = useModalFocus<HTMLDivElement>();
+  const dialogRef = useModalFocus<HTMLDivElement>(onClose);
   return (
     <div className="dossier-modal-overlay" onClick={onClose}>
       <div

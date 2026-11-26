@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export function useModalFocus<T extends HTMLElement>() {
+export function useModalFocus<T extends HTMLElement>(onClose?: () => void) {
   const dialogRef = useRef<T | null>(null);
 
   useEffect(() => {
@@ -30,6 +30,12 @@ export function useModalFocus<T extends HTMLElement>() {
     dialog.querySelector<HTMLElement>(FOCUSABLE)?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onClose) {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+        return;
+      }
       if (e.key !== 'Tab') return;
       const items = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE));
       if (items.length === 0) return;
@@ -51,7 +57,7 @@ export function useModalFocus<T extends HTMLElement>() {
       inerted.forEach((el) => el.removeAttribute('inert'));
       opener?.focus();
     };
-  }, []);
+  }, [onClose]);
 
   return dialogRef;
 }

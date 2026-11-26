@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function CampusMapModal({ onClose, onWarp }: Props) {
-  const dialogRef = useModalFocus<HTMLDivElement>();
+  const dialogRef = useModalFocus<HTMLDivElement>(onClose);
   return (
     <div className="dossier-modal-overlay" onClick={onClose}>
       <div
