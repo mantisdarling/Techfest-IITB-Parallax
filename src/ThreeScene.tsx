@@ -81,12 +81,15 @@ function ThreeScene({
     const drag = attachDragControls(ctx.renderer.domElement, ctx.camera, objects, cameraModeRef);
 
     let animationFrameId = 0;
-    const clock = new THREE.Clock();
+    const frameInterval = 1000 / quality.maxFps;
+    let lastFrameTime: number | null = null;
     let elapsedTime = 0;
 
-    const animate = () => {
+    const animate = (time: number) => {
       animationFrameId = requestAnimationFrame(animate);
-      const dt = Math.min(clock.getDelta(), 0.05);
+      if (lastFrameTime !== null && time - lastFrameTime < frameInterval) return;
+      const dt = lastFrameTime === null ? 1 / 60 : Math.min((time - lastFrameTime) / 1000, 0.05);
+      lastFrameTime = time;
       elapsedTime += dt;
 
       updateWorld(
@@ -107,7 +110,7 @@ function ThreeScene({
 
       ctx.renderer.render(ctx.scene, ctx.camera);
     };
-    animate();
+    animate(performance.now());
 
     return () => {
       cancelAnimationFrame(animationFrameId);
