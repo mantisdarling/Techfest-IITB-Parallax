@@ -16,6 +16,8 @@ export function attachDragControls(
   const isDragging = { current: false };
   let activePointerId: number | null = null;
   let prev = { x: 0, y: 0 };
+  let pending: { x: number; y: number } | null = null;
+  let frameId = 0;
 
   const onPointerDown = (e: PointerEvent) => {
     if (!e.isPrimary || e.button !== 0) return;
@@ -25,10 +27,11 @@ export function attachDragControls(
     dom.setPointerCapture(e.pointerId);
   };
 
-  const onPointerMove = (e: PointerEvent) => {
-    if (!isDragging.current || e.pointerId !== activePointerId) return;
-    const dx = e.clientX - prev.x;
-    const dy = e.clientY - prev.y;
+  const flushMovement = () => {
+    frameId = 0;
+    if (!pending || !isDragging.current) return;
+    const dx = pending.x - prev.x;
+    const dy = pending.y - prev.y;
 
     if (cameraModeRef.current === 'orbit' || cameraModeRef.current === 'fpv') {
       camera.rotation.y -= dx * 0.005;
@@ -37,13 +40,23 @@ export function attachDragControls(
       objects.droneSwarmMesh.rotation.y += dx * 0.008;
       objects.droneSwarmMesh.rotation.x += dy * 0.008;
     }
-    prev = { x: e.clientX, y: e.clientY };
+    prev = pending;
+    pending = null;
+  };
+
+  const onPointerMove = (e: PointerEvent) => {
+    if (!isDragging.current || e.pointerId !== activePointerId) return;
+    pending = { x: e.clientX, y: e.clientY };
+    if (!frameId) frameId = requestAnimationFrame(flushMovement);
   };
 
   const endDrag = (e: PointerEvent) => {
     if (e.pointerId !== activePointerId) return;
     isDragging.current = false;
     activePointerId = null;
+    pending = null;
+    if (frameId) cancelAnimationFrame(frameId);
+    frameId = 0;
     if (dom.hasPointerCapture(e.pointerId)) dom.releasePointerCapture(e.pointerId);
   };
 
@@ -61,6 +74,7 @@ export function attachDragControls(
   return {
     isDragging,
     dispose: () => {
+      if (frameId) cancelAnimationFrame(frameId);
       dom.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', endDrag);

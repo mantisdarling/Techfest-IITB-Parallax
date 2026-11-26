@@ -1,10 +1,19 @@
 import { fireEvent } from '@testing-library/react';
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { attachDragControls } from './input';
 
 describe('attachDragControls', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('rotates the drone swarm with a captured touch pointer', () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      callback(0);
+      return 1;
+    });
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
     const dom = document.createElement('canvas');
     const camera = new THREE.PerspectiveCamera();
     const swarm = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial());
