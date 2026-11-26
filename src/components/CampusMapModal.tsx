@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { CAMPUS_VENUES } from '../data/realms';
+import { useModalFocus } from '../hooks/useModalFocus';
 
 interface Props {
   onClose: () => void;
@@ -7,9 +8,11 @@ interface Props {
 }
 
 export default function CampusMapModal({ onClose, onWarp }: Props) {
+  const dialogRef = useModalFocus<HTMLDivElement>();
   return (
     <div className="dossier-modal-overlay" onClick={onClose}>
       <div
+        ref={dialogRef}
         className="dossier-card"
         role="dialog"
         aria-modal="true"
@@ -35,7 +38,7 @@ export default function CampusMapModal({ onClose, onWarp }: Props) {
           </p>
 
           <div className="campus-map-grid">
-            {CAMPUS_VENUES.map((v, i) => (
+            {CAMPUS_VENUES.map((v) => (
               <div
                 key={v.name}
                 className="venue-card"
@@ -43,12 +46,13 @@ export default function CampusMapModal({ onClose, onWarp }: Props) {
                 tabIndex={0}
                 onClick={() => {
                   onClose();
-                  onWarp(i);
+                  onWarp(v.realmIndex);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
                     onClose();
-                    onWarp(i);
+                    onWarp(v.realmIndex);
                   }
                 }}
               >

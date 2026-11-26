@@ -114,6 +114,8 @@ export default function App() {
     setBotControl((prev) => ({ ...prev, x: 0, z: 0 }));
   }, [setBotControl]);
 
+  const handleExitCockpit = useCallback(() => setCameraMode('scroll'), []);
+
   return (
     <div className="app-container">
       <Suspense fallback={<div className="scene-loading">LOADING 3D EXPERIENCE...</div>}>
@@ -133,7 +135,7 @@ export default function App() {
         <CockpitHud
           botActive={botControl.active}
           goalAchieved={botGoalAchieved}
-          onExit={() => setCameraMode('scroll')}
+          onExit={handleExitCockpit}
         />
       )}
 

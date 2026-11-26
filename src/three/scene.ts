@@ -59,7 +59,10 @@ export function createScene(container: HTMLElement): SceneContext {
       ) {
         obj.geometry.dispose();
         const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
-        materials.forEach((m) => m.dispose());
+        materials.forEach((m) => {
+          if (m instanceof THREE.MeshBasicMaterial && m.map) m.map.dispose();
+          m.dispose();
+        });
       }
     });
     renderer.dispose();

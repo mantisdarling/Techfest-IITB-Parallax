@@ -20,6 +20,7 @@ export interface CampusVenue {
   event: string;
   cap: string;
   icon: string;
+  realmIndex: number;
 }
 
 export interface PassData {

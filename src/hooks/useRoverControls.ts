@@ -11,6 +11,13 @@ export function useRoverControls(activeRealmIndex: number, playSfx: PlaySfx) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeRealmIndex !== 1) return;
+      const target = e.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+      ) {
+        return;
+      }
       const dir = keyToDirection(e.key);
       if (dir) {
         setBotControl({ x: dir.dx, z: dir.dz, active: true });

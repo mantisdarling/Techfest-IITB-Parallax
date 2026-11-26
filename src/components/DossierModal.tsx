@@ -1,4 +1,5 @@
 import { ChevronRight, X } from 'lucide-react';
+import { useModalFocus } from '../hooks/useModalFocus';
 import type { RealmData } from '../types';
 
 interface Props {
@@ -8,9 +9,11 @@ interface Props {
 }
 
 export default function DossierModal({ realm, onClose, onClaimPass }: Props) {
+  const dialogRef = useModalFocus<HTMLDivElement>();
   return (
     <div className="dossier-modal-overlay" onClick={onClose}>
       <div
+        ref={dialogRef}
         className="dossier-card"
         role="dialog"
         aria-modal="true"

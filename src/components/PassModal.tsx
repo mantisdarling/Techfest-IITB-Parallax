@@ -1,5 +1,6 @@
 import { Download, Terminal, X } from 'lucide-react';
 import { CYBER_DIVISIONS } from '../data/realms';
+import { useModalFocus } from '../hooks/useModalFocus';
 import type { PassData } from '../types';
 
 interface Props {
@@ -10,9 +11,11 @@ interface Props {
 }
 
 export default function PassModal({ passData, onChange, onClose, onSave }: Props) {
+  const dialogRef = useModalFocus<HTMLDivElement>();
   return (
     <div className="dossier-modal-overlay" onClick={onClose}>
       <div
+        ref={dialogRef}
         className="dossier-card pass-card"
         role="dialog"
         aria-modal="true"

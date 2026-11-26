@@ -68,10 +68,34 @@ export const REALM_DATA: RealmData[] = [
 ];
 
 export const CAMPUS_VENUES: CampusVenue[] = [
-  { name: 'GYMKHANA GROUNDS', event: 'Robowars & Meshmerize', cap: '15,000', icon: '01' },
-  { name: 'CONVOCATION HALL', event: 'World Technology Summit', cap: '2,500', icon: '02' },
-  { name: 'OPEN AIR THEATRE (OAT)', event: 'Technoholix EDM Night', cap: '25,000', icon: '03' },
-  { name: 'SAC LAWNS', event: 'Drone Light Show & Exhibits', cap: '10,000', icon: '04' },
+  {
+    name: 'GYMKHANA GROUNDS',
+    event: 'Robowars & Meshmerize',
+    cap: '15,000',
+    icon: '01',
+    realmIndex: 1,
+  },
+  {
+    name: 'CONVOCATION HALL',
+    event: 'World Technology Summit',
+    cap: '2,500',
+    icon: '02',
+    realmIndex: 0,
+  },
+  {
+    name: 'OPEN AIR THEATRE (OAT)',
+    event: 'Technoholix EDM Night',
+    cap: '25,000',
+    icon: '03',
+    realmIndex: 3,
+  },
+  {
+    name: 'SAC LAWNS',
+    event: 'Drone Light Show & Exhibits',
+    cap: '10,000',
+    icon: '04',
+    realmIndex: 2,
+  },
 ];
 
 export const CYBER_DIVISIONS = [

@@ -57,8 +57,19 @@ function DpadButton({
       aria-label={label}
       onMouseDown={() => onSteer({ x, z, active: true })}
       onMouseUp={onRelease}
+      onMouseLeave={onRelease}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSteer({ x, z, active: true });
+        }
+      }}
+      onKeyUp={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onRelease();
+      }}
       onTouchStart={() => onSteer({ x, z, active: true })}
       onTouchEnd={onRelease}
+      onTouchCancel={onRelease}
     >
       <Icon size={16} />
     </button>

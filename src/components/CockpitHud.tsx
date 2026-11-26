@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 interface Props {
   botActive: boolean;
   goalAchieved: boolean;
@@ -5,6 +7,14 @@ interface Props {
 }
 
 export default function CockpitHud({ botActive, goalAchieved, onExit }: Props) {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onExit();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onExit]);
+
   return (
     <div className="cockpit-hud-overlay">
       <div className="cockpit-hud-row">
