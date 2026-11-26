@@ -26,6 +26,8 @@ release will be published and the advisory disclosed.
 
 ## Scope
 
-This is a client-side WebGL experience with no backend, no authentication, and
-no data collection. Reports about dependency vulnerabilities are welcome;
-Dependabot and CodeQL run automatically on this repository.
+This is a client-side WebGL experience with no backend or authentication. The
+application does not collect personal data, and fonts are served from the same
+origin. A hosting provider may still process standard request metadata such as
+IP addresses. Reports about dependency vulnerabilities are welcome; Dependabot
+and CodeQL run automatically on this repository.
