@@ -30,21 +30,21 @@ export function updateWorld(
   onBotGoal?: () => void
 ): void {
   const factor = 1.0 - Math.exp(-9.0 * dt);
+  const visibility = realmVisibility(camera.position.z);
 
-  if (objects.ring1) {
+  if (visibility.realm1 && objects.ring1) {
     objects.ring1.rotation.z += 1.0 * dt;
   }
 
-  if (objects.goalMesh) {
+  if (visibility.realm2 && objects.goalMesh) {
     objects.goalMesh.rotation.y += 2.5 * dt;
     objects.goalMesh.rotation.x += 1.2 * dt;
   }
 
-  updateRover(objects, state, dt, elapsedTime, onBotGoal);
-  updateDroneSwarm(objects, state, dt);
-  updateStage(objects, state, elapsedTime);
+  if (visibility.realm2) updateRover(objects, state, dt, elapsedTime, onBotGoal);
+  if (visibility.realm3) updateDroneSwarm(objects, state, dt);
+  if (visibility.realm4) updateStage(objects, state, elapsedTime);
 
-  const visibility = realmVisibility(camera.position.z);
   if (objects.realm1) objects.realm1.visible = visibility.realm1;
   if (objects.realm2) objects.realm2.visible = visibility.realm2;
   if (objects.realm3) objects.realm3.visible = visibility.realm3;
