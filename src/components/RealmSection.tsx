@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { ChevronRight, Crosshair, Eye } from 'lucide-react';
 import type { BotControl, DroneFormation, RealmData, SfxType } from '../types';
 import RoverController from './RoverController';
@@ -19,10 +20,10 @@ interface Props {
   onSfxBadge: () => void;
   onInspect: (realm: RealmData) => void;
   onEnterCockpit: () => void;
-  onNextRealm: () => void;
+  onNextRealm: (index: number) => void;
 }
 
-export default function RealmSection({
+function RealmSection({
   realm,
   index,
   botGoalAchieved,
@@ -99,7 +100,7 @@ export default function RealmSection({
               </button>
             )}
 
-            <button type="button" className="manga-btn-outline" onClick={onNextRealm}>
+            <button type="button" className="manga-btn-outline" onClick={() => onNextRealm(index)}>
               <span>NEXT REALM</span>
               <ChevronRight size={14} />
             </button>
@@ -109,3 +110,5 @@ export default function RealmSection({
     </section>
   );
 }
+
+export default memo(RealmSection);

@@ -115,6 +115,11 @@ export default function App() {
   }, [setBotControl]);
 
   const handleExitCockpit = useCallback(() => setCameraMode('scroll'), []);
+  const handleEnterCockpit = useCallback(() => setCameraMode('cockpit'), []);
+  const handleNextRealm = useCallback(
+    (index: number) => warpToRealm((index + 1) % REALM_DATA.length),
+    [warpToRealm]
+  );
 
   return (
     <div className="app-container">
@@ -171,8 +176,8 @@ export default function App() {
             onToggleDjLoop={toggleDjLoop}
             onSfxBadge={handleSfxBadge}
             onInspect={handleInspect}
-            onEnterCockpit={() => setCameraMode('cockpit')}
-            onNextRealm={() => warpToRealm((index + 1) % REALM_DATA.length)}
+            onEnterCockpit={handleEnterCockpit}
+            onNextRealm={handleNextRealm}
           />
         ))}
       </main>
