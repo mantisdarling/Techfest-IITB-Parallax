@@ -42,6 +42,10 @@ export function useAudioSynth() {
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + preset.duration);
         osc.connect(gain);
         gain.connect(ctx.destination);
+        osc.onended = () => {
+          osc.disconnect();
+          gain.disconnect();
+        };
         osc.start();
         osc.stop(ctx.currentTime + preset.duration);
       } catch (error) {
