@@ -1,17 +1,49 @@
 import { Download, Terminal, X } from 'lucide-react';
-import { CYBER_DIVISIONS } from '../data/realms';
+import { useState } from 'react';
+import { CYBER_DIVISIONS, DEFAULT_PASS_DATA } from '../data/realms';
 import { useModalFocus } from '../hooks/useModalFocus';
 import type { PassData } from '../types';
 
 interface Props {
-  passData: PassData;
-  onChange: (data: PassData) => void;
   onClose: () => void;
-  onSave: () => void;
 }
 
-export default function PassModal({ passData, onChange, onClose, onSave }: Props) {
+function sanitizePassText(value: string, maxLength: number): string {
+  return value.replace(/[\u0000-\u001f\u007f-\u009f]/g, '').slice(0, maxLength);
+}
+
+export default function PassModal({ onClose }: Props) {
+  const [passData, setPassData] = useState<PassData>(DEFAULT_PASS_DATA);
   const dialogRef = useModalFocus<HTMLDivElement>(onClose);
+
+  const updateField = (field: 'name' | 'college', value: string) => {
+    const sanitized = sanitizePassText(value, field === 'name' ? 48 : 80);
+    setPassData((current) => ({ ...current, [field]: sanitized }));
+  };
+
+  const handleSave = () => {
+    const name = passData.name.trim() || 'ANONYMOUS CYBORG';
+    const college = passData.college.trim() || 'INDEPENDENT EXPLORER';
+    const content = [
+      'TECHFEST 2026 MANGA KEEPSAKE',
+      'This fan keepsake is not valid for event entry.',
+      '',
+      `CALLSIGN: ${name}`,
+      `INSTITUTE: ${college}`,
+      `DIVISION: ${passData.avatar}`,
+      `DESIGN SERIES: ${passData.roll}`,
+    ].join('\n');
+    const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'techfest-manga-keepsake.txt';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    onClose();
+  };
+
   return (
     <div className="dossier-modal-overlay" onClick={onClose}>
       <div
@@ -23,7 +55,7 @@ export default function PassModal({ passData, onChange, onClose, onSave }: Props
         onClick={(e) => e.stopPropagation()}
       >
         <div className="dossier-header">
-          <span className="pass-title">🎟️ CUSTOM MANGA CYBER PASS GENERATOR</span>
+          <span className="pass-title">CUSTOM MANGA CYBER KEEPSAKE</span>
           <button
             type="button"
             className="modal-close"
@@ -39,7 +71,7 @@ export default function PassModal({ passData, onChange, onClose, onSave }: Props
             <div className="ticket-header-row">
               <div>
                 <span className="hud-logo-box ticket-logo">TECHFEST 2026</span>
-                <span className="ticket-official-label">OFFICIAL BOARDING PASS</span>
+                <span className="ticket-official-label">FAN KEEPSAKE // NOT VALID FOR ENTRY</span>
               </div>
               <span className="ticket-iitb">IIT BOMBAY</span>
             </div>
@@ -48,16 +80,16 @@ export default function PassModal({ passData, onChange, onClose, onSave }: Props
               <div>
                 <div className="ticket-name">{passData.name || 'ANONYMOUS CYBORG'}</div>
                 <div className="ticket-meta">COLLEGE: {passData.college || 'IIT BOMBAY'}</div>
-                <div className="ticket-meta">ID TOKEN: {passData.roll || 'TF 2026 X01'}</div>
+                <div className="ticket-meta">DESIGN SERIES: {passData.roll}</div>
                 <div className="ticket-division">DIVISION: {passData.avatar}</div>
               </div>
 
               <div className="ticket-qr">
-                <div className="ticket-qr-label">[QR VERIFIED]</div>
+                <div className="ticket-qr-label">FAN PASS</div>
                 <div className="ticket-qr-icon">
                   <Terminal size={32} />
                 </div>
-                <div className="ticket-qr-sub">UNESCO COMPLIANT</div>
+                <div className="ticket-qr-sub">NO ENTRY ACCESS</div>
               </div>
             </div>
 
@@ -74,7 +106,9 @@ export default function PassModal({ passData, onChange, onClose, onSave }: Props
                 type="text"
                 className="pass-input"
                 value={passData.name}
-                onChange={(e) => onChange({ ...passData, name: e.target.value })}
+                maxLength={48}
+                autoComplete="name"
+                onChange={(e) => updateField('name', e.target.value)}
               />
             </div>
 
@@ -87,7 +121,9 @@ export default function PassModal({ passData, onChange, onClose, onSave }: Props
                 type="text"
                 className="pass-input"
                 value={passData.college}
-                onChange={(e) => onChange({ ...passData, college: e.target.value })}
+                maxLength={80}
+                autoComplete="organization"
+                onChange={(e) => updateField('college', e.target.value)}
               />
             </div>
           </div>
@@ -95,22 +131,23 @@ export default function PassModal({ passData, onChange, onClose, onSave }: Props
           <div className="pass-division-section">
             <span className="pass-label pass-division-label">SELECT CYBER DIVISION</span>
             <div className="pass-division-row">
-              {CYBER_DIVISIONS.map((av) => (
+              {CYBER_DIVISIONS.map((avatar) => (
                 <button
-                  key={av}
+                  key={avatar}
                   type="button"
-                  className={`formation-btn ${passData.avatar === av ? 'active' : ''}`}
-                  onClick={() => onChange({ ...passData, avatar: av })}
+                  className={`formation-btn ${passData.avatar === avatar ? 'active' : ''}`}
+                  aria-pressed={passData.avatar === avatar}
+                  onClick={() => setPassData((current) => ({ ...current, avatar }))}
                 >
-                  {av}
+                  {avatar}
                 </button>
               ))}
             </div>
           </div>
 
-          <button type="button" className="manga-btn pass-save-btn" onClick={onSave}>
+          <button type="button" className="manga-btn pass-save-btn" onClick={handleSave}>
             <Download size={16} />
-            <span>SAVE &amp; DOWNLOAD BOARDING PASS</span>
+            <span>SAVE MANGA KEEPSAKE</span>
           </button>
         </div>
       </div>

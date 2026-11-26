@@ -5,10 +5,10 @@ import type { RealmData } from '../types';
 interface Props {
   realm: RealmData;
   onClose: () => void;
-  onClaimPass: () => void;
+  onCreatePass: () => void;
 }
 
-export default function DossierModal({ realm, onClose, onClaimPass }: Props) {
+export default function DossierModal({ realm, onClose, onCreatePass }: Props) {
   const dialogRef = useModalFocus<HTMLDivElement>(onClose);
   return (
     <div className="dossier-modal-overlay" onClick={onClose}>
@@ -58,8 +58,8 @@ export default function DossierModal({ realm, onClose, onClaimPass }: Props) {
           </div>
 
           <div className="dossier-footer">
-            <button type="button" className="manga-btn" onClick={onClaimPass}>
-              <span>CLAIM FESTIVAL PASS</span>
+            <button type="button" className="manga-btn" onClick={onCreatePass}>
+              <span>CREATE MANGA PASS</span>
               <ChevronRight size={14} />
             </button>
           </div>

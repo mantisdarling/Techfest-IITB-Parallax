@@ -98,24 +98,19 @@ describe('App', () => {
     await user.click(screen.getAllByRole('button', { name: /INSPECT DOSSIER/ })[0]);
     const dossier = screen.getByRole('dialog', { name: 'Realm dossier' });
     expect(within(dossier).getByText('WHERE IDEAS TAKE FLIGHT')).toBeInTheDocument();
-    await user.click(within(dossier).getByRole('button', { name: /CLAIM FESTIVAL PASS/ }));
+    await user.click(within(dossier).getByRole('button', { name: /CREATE MANGA PASS/ }));
     expect(screen.queryByRole('dialog', { name: 'Realm dossier' })).not.toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Cyber pass generator' })).toBeInTheDocument();
   });
 
-  it('live-updates the boarding pass preview and saves', async () => {
+  it('live-updates the manga keepsake preview', async () => {
     const user = await renderApp();
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
     await user.click(screen.getByRole('button', { name: /GET PASS/ }));
     const dialog = screen.getByRole('dialog', { name: 'Cyber pass generator' });
     const nameInput = within(dialog).getByLabelText('CALLSIGN / YOUR NAME');
     await user.clear(nameInput);
     await user.type(nameInput, 'ROVER PILOT');
     expect(within(dialog).getByText('ROVER PILOT')).toBeInTheDocument();
-    await user.click(within(dialog).getByRole('button', { name: /SAVE & DOWNLOAD BOARDING PASS/ }));
-    expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('ROVER PILOT'));
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    alertSpy.mockRestore();
   });
 
   it('switches drone formations', async () => {

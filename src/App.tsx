@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
-import { DEFAULT_PASS_DATA, REALM_DATA } from './data/realms';
+import { REALM_DATA } from './data/realms';
 import { realmIndexFromLocation } from './lib/url';
 import { useAudioSynth } from './hooks/useAudioSynth';
 import { useScrollTracking } from './hooks/useScrollTracking';
@@ -13,7 +13,7 @@ import RealmSection from './components/RealmSection';
 import CampusMapModal from './components/CampusMapModal';
 import DossierModal from './components/DossierModal';
 import PassModal from './components/PassModal';
-import type { CameraMode, DroneFormation, PassData, RealmData } from './types';
+import type { CameraMode, DroneFormation, RealmData } from './types';
 import './App.css';
 
 const ThreeScene = lazy(() => import('./ThreeScene'));
@@ -31,7 +31,6 @@ export default function App() {
 
   const [cameraMode, setCameraMode] = useState<CameraMode>('scroll');
   const [droneFormation, setDroneFormation] = useState<DroneFormation>('sphere');
-  const [passData, setPassData] = useState<PassData>(DEFAULT_PASS_DATA);
   const goalCapturedRef = useRef(false);
 
   const warpToRealm = useCallback(
@@ -103,12 +102,6 @@ export default function App() {
     playSfx('click');
     modalActions.openPass();
   }, [playSfx, modalActions]);
-
-  const handleSavePass = useCallback(() => {
-    playSfx('drop');
-    alert(`[SUCCESS] Manga Boarding Pass Generated for ${passData.name}! Token stored.`);
-    modalActions.closePass();
-  }, [playSfx, passData.name, modalActions]);
 
   const handleSteerRelease = useCallback(() => {
     setBotControl((prev) => ({ ...prev, x: 0, z: 0 }));
@@ -196,21 +189,14 @@ export default function App() {
         <DossierModal
           realm={modalState.dossier}
           onClose={modalActions.closeDossier}
-          onClaimPass={() => {
+          onCreatePass={() => {
             modalActions.closeDossier();
             modalActions.openPass();
           }}
         />
       )}
 
-      {modalState.passModalOpen && (
-        <PassModal
-          passData={passData}
-          onChange={setPassData}
-          onClose={modalActions.closePass}
-          onSave={handleSavePass}
-        />
-      )}
+      {modalState.passModalOpen && <PassModal onClose={modalActions.closePass} />}
     </div>
   );
 }
