@@ -18,6 +18,44 @@
   box-sizing: border-box;
 }
 
+button,
+a[href],
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button, a[href], input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--paper-white);
+  outline-offset: 3px;
+}
+
+@media (pointer: coarse) {
+  button,
+  [role='button'],
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .pass-input {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .dpad-container {
+    grid-template-columns: repeat(3, 48px);
+    grid-template-rows: repeat(3, 48px);
+  }
+
+  .dj-pad {
+    min-height: 56px;
+  }
+}
+
 html {
   background-color: var(--ink-black);
   color: var(--paper-white);
