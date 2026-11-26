@@ -93,13 +93,23 @@ function updateDroneSwarm(objects: SceneObjects, state: WorldState, dt: number):
 
   const attr = swarm.geometry.attributes.position as THREE.BufferAttribute;
   const positions = attr.array as Float32Array;
-  const target = objects.morphTargets[state.droneFormation] || objects.morphTargets.sphere;
-  const droneLerp = 1.0 - Math.exp(-4.5 * dt);
+  const formation = objects.morphTargets[state.droneFormation] ? state.droneFormation : 'sphere';
+  const target = objects.morphTargets[formation];
 
-  for (let i = 0; i < positions.length; i++) {
-    positions[i] += (target[i] - positions[i]) * droneLerp;
+  if (swarm.userData.settledFormation !== formation) {
+    const droneLerp = 1.0 - Math.exp(-4.5 * dt);
+    let maxDelta = 0;
+    for (let i = 0; i < positions.length; i++) {
+      const delta = target[i] - positions[i];
+      positions[i] += delta * droneLerp;
+      maxDelta = Math.max(maxDelta, Math.abs(delta));
+    }
+    if (maxDelta < 0.01) {
+      positions.set(target);
+      swarm.userData.settledFormation = formation;
+    }
+    attr.needsUpdate = true;
   }
-  attr.needsUpdate = true;
 
   if (!state.isDragging) {
     swarm.rotation.y += 0.25 * dt;
