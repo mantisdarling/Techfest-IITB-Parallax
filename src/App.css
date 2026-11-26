@@ -722,6 +722,199 @@
   }
 }
 
+@media (max-width: 600px) {
+  .manga-hud-header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) 0.75rem
+      max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .hud-brand {
+    flex: 1;
+    min-width: 0;
+    gap: 0.6rem;
+  }
+
+  .brand-main {
+    font-size: 0.95rem;
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .mobile-nav {
+    order: 1;
+  }
+
+  .mobile-nav-panel {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 4.5rem);
+    right: 0.75rem;
+  }
+
+  .hud-controls {
+    order: 2;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .control-icon-btn,
+  .hud-pass-btn {
+    flex: 1;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .scroll-tracker {
+    top: calc(118px + env(safe-area-inset-top));
+  }
+
+  .scroll-realm {
+    padding: 9rem 0.9rem 7rem;
+  }
+
+  .realm-content.right-aligned {
+    margin-left: 0;
+  }
+
+  .manga-panel-card {
+    padding: 1.4rem 1rem;
+    border-width: 2px;
+    box-shadow: 5px 5px 0 #333333;
+  }
+
+  .manga-title {
+    font-size: clamp(1.55rem, 8vw, 2rem);
+    overflow-wrap: anywhere;
+  }
+
+  .manga-desc {
+    font-size: 0.95rem;
+  }
+
+  .sound-fx-badge {
+    right: 0;
+    font-size: 1.45rem;
+  }
+
+  .manga-specs-grid {
+    gap: 0.6rem;
+  }
+
+  .spec-item,
+  .spec-val {
+    overflow-wrap: anywhere;
+  }
+
+  .realm-actions > button {
+    flex: 1 1 130px;
+  }
+
+  .rover-controller-box {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .dpad-container {
+    align-self: center;
+  }
+
+  .cockpit-hud-overlay {
+    padding: calc(8rem + env(safe-area-inset-top)) 1rem calc(7rem + env(safe-area-inset-bottom));
+  }
+
+  .cockpit-hud-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .cockpit-telemetry-left,
+  .cockpit-telemetry-right {
+    font-size: 0.62rem;
+  }
+
+  .cockpit-reticle-center {
+    width: 100px;
+    height: 100px;
+  }
+
+  .manga-hud-footer {
+    padding: 0.6rem 0.75rem max(0.6rem, env(safe-area-inset-bottom));
+  }
+
+  .hud-hint {
+    display: none;
+  }
+
+  .hud-telemetry-box {
+    gap: 0.5rem;
+    font-size: 0.62rem;
+  }
+
+  .dossier-modal-overlay {
+    padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem
+      max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .dossier-card {
+    border-width: 3px;
+    box-shadow: none;
+  }
+
+  .dossier-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 0.75rem;
+  }
+
+  .dossier-header-left {
+    min-width: 0;
+    gap: 0.5rem;
+  }
+
+  .dossier-title,
+  .pass-title {
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+  }
+
+  .dossier-content {
+    padding: 1rem;
+  }
+
+  .ticket-canvas-frame {
+    padding: 1rem;
+  }
+
+  .ticket-header-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .ticket-official-label {
+    display: block;
+    margin: 0.4rem 0 0;
+  }
+
+  .ticket-grid,
+  .pass-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-qr {
+    width: 160px;
+    justify-self: center;
+  }
+
+  .ticket-name {
+    overflow-wrap: anywhere;
+  }
+}
+
 /* ==========================================================================
    EXTRACTED COMPONENT STYLES (previously inline)
    ========================================================================== */
